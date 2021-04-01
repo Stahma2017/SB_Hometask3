@@ -9,5 +9,5 @@ interface IArticleViewModel {
     fun handleShare()
     fun handleToggleMenu()
     fun handleSearchMode(isSearchMode: Boolean)
-    fun handleSearchQuery(query: String?)
+    fun handleSearch(query: String?)
 }
