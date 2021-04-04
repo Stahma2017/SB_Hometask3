@@ -8,15 +8,15 @@ import ru.skillbranch.skillarticles.viewmodels.ArticleViewModel
 
 abstract class BaseViewModel<T: IViewModelState>(initialState: T) : ViewModel() {
     @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
-    public val notifications = MutableLiveData<Event<Notify>>()
+    val notifications = MutableLiveData<Event<Notify>>()
 
     @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
-    public val state: MediatorLiveData<T> = MediatorLiveData<T>().apply {
+    val state: MediatorLiveData<T> = MediatorLiveData<T>().apply {
         value = initialState
     }
 
     @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
-    protected val currentState
+    val currentState
         get() = state.value!!
 
     @UiThread

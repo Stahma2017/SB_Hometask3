@@ -1,6 +1,5 @@
 package ru.skillbranch.skillarticles.ui
 
-import android.content.Intent
 import android.os.Bundle
 import android.text.Selection
 import android.text.Spannable
@@ -10,6 +9,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.annotation.VisibleForTesting
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
@@ -44,10 +44,14 @@ class RootActivity : BaseActivity<ArticleViewModel>(), IArticleView {
         ViewModelProvider(this, vmFactory).get(ArticleViewModel::class.java)
     }
 
-    override val binding: ArticleBinding by lazy { ArticleBinding() }
+    @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
+    public override val binding: ArticleBinding by lazy { ArticleBinding() }
 
-    private val bgColor by AttrValue(R.attr.colorSecondary)
-    private val fgColor by AttrValue(R.attr.colorOnSecondary)
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    val bgColor by AttrValue(R.attr.colorSecondary)
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    val fgColor by AttrValue(R.attr.colorOnSecondary)
+
 
     override fun setupViews() {
         setupToolbar()
