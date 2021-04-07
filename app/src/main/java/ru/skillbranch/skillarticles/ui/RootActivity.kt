@@ -284,7 +284,7 @@ class RootActivity : BaseActivity<ArticleViewModel>(), IArticleView {
             data as ArticleState
 
             isLike = data.isLike
-            isBookmark = data.isBookMark
+            isBookmark = data.isBookmark
             isShowMenu = data.isShowMenu
             isBigText = data.isBigText
             isDarkMode = data.isDarkMode

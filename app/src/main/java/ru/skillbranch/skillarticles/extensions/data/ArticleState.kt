@@ -9,5 +9,5 @@ fun ArticleState.toAppSettings() : AppSettings {
 }
 
 fun ArticleState.toArticlePersonalInfo() : ArticlePersonalInfo {
-    return ArticlePersonalInfo(isLike, isBookMark)
+    return ArticlePersonalInfo(isLike, isBookmark)
 }

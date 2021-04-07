@@ -40,7 +40,7 @@ class ArticleViewModel(private val articleId: String) : BaseViewModel<ArticleSta
         subscribeOnDataSource(getArticlePersonalInfo()) { info, state ->
             info ?: return@subscribeOnDataSource null
             state.copy(
-                isBookMark = info.isBookMark,
+                isBookmark = info.isBookMark,
                 isLike = info.isLike
             )
         }
@@ -99,7 +99,7 @@ class ArticleViewModel(private val articleId: String) : BaseViewModel<ArticleSta
     }
 
     override fun handleBookmark() {
-        updateState { it.copy(isBookMark = !it.isBookMark) }
+        updateState { it.copy(isBookmark = !it.isBookmark) }
     }
 
     override fun handleShare() {
@@ -136,7 +136,7 @@ data class ArticleState(
     val isLoadingContent: Boolean = true, //контент загружается
     val isLoadingReviews: Boolean = true, //отзывы загружаются
     val isLike: Boolean = false, //отмечено как Like
-    val isBookMark: Boolean = false, //в закладках
+    val isBookmark: Boolean = false, //в закладках
     val isShowMenu: Boolean = false, //отображается меню
     val isBigText: Boolean = false, //шрифт увеличен
     val isDarkMode: Boolean = false, //темный режим
@@ -168,7 +168,7 @@ data class ArticleState(
     override fun restore(savedState: Bundle): IViewModelState {
         return copy(
             isSearch = savedState["isSearch"] as Boolean,
-            searchQuery = savedState["searchQuery"] as String,
+            searchQuery = savedState["searchQuery"] as? String,
             searchResults = savedState["searchResults"] as List<Pair<Int, Int>>,
             searchPosition = savedState["searchPosition"] as Int
         )
