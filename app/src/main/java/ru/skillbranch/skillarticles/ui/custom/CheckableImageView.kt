@@ -43,8 +43,4 @@ class CheckableImageView @JvmOverloads constructor(
     override fun onClick(v: View?) {
         toggle()
     }
-
-    fun bla() {
-        print("bla clicked")
-    }
 }

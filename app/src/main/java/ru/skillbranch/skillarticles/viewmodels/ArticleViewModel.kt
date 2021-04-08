@@ -12,6 +12,7 @@ import ru.skillbranch.skillarticles.extensions.format
 import ru.skillbranch.skillarticles.extensions.indexesOf
 import ru.skillbranch.skillarticles.viewmodels.base.BaseViewModel
 import ru.skillbranch.skillarticles.viewmodels.base.IViewModelState
+import ru.skillbranch.skillarticles.viewmodels.base.Notify
 
 class ArticleViewModel(private val articleId: String) : BaseViewModel<ArticleState>(ArticleState()),
     IArticleViewModel {
@@ -25,7 +26,8 @@ class ArticleViewModel(private val articleId: String) : BaseViewModel<ArticleSta
                 title = article.title,
                 category = article.category,
                 categoryIcon = article.categoryIcon,
-                date = article.date.format()
+                date = article.date.format(),
+                author = article.author
             )
         }
 
@@ -40,7 +42,7 @@ class ArticleViewModel(private val articleId: String) : BaseViewModel<ArticleSta
         subscribeOnDataSource(getArticlePersonalInfo()) { info, state ->
             info ?: return@subscribeOnDataSource null
             state.copy(
-                isBookmark = info.isBookMark,
+                isBookmark = info.isBookmark,
                 isLike = info.isLike
             )
         }
@@ -99,7 +101,16 @@ class ArticleViewModel(private val articleId: String) : BaseViewModel<ArticleSta
     }
 
     override fun handleBookmark() {
-        updateState { it.copy(isBookmark = !it.isBookmark) }
+       // updateState { it.copy(isBookmark = !it.isBookmark) }
+        val toggleBookmark = {
+            val info = currentState.toArticlePersonalInfo()
+            repository.updateArticlePersonalInfo(info.copy(isBookmark = !info.isBookmark))
+        }
+        toggleBookmark()
+
+        val msg = if (currentState.isBookmark) Notify.TextMessage("Add to bookmarks")
+        else Notify.TextMessage("Remove from bookmarks")
+        notify(msg)
     }
 
     override fun handleShare() {
@@ -154,6 +165,7 @@ data class ArticleState(
     val content: List<Any> = emptyList(), //контент
     val reviews: List<Any> = emptyList() //комментарии
 ) : IViewModelState {
+
     override fun save(outState: Bundle) {
         outState.putAll(
             bundleOf(

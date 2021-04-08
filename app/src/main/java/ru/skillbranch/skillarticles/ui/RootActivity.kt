@@ -14,7 +14,9 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
 import androidx.core.text.getSpans
+import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProviders
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_root.*
 import kotlinx.android.synthetic.main.layout_bottombar.*
@@ -34,6 +36,7 @@ import ru.skillbranch.skillarticles.viewmodels.ArticleState
 import ru.skillbranch.skillarticles.viewmodels.ArticleViewModel
 import ru.skillbranch.skillarticles.viewmodels.base.BaseViewModel
 import ru.skillbranch.skillarticles.viewmodels.base.IViewModelState
+import ru.skillbranch.skillarticles.viewmodels.base.Notify
 import ru.skillbranch.skillarticles.viewmodels.base.ViewModelFactory
 
 class RootActivity : BaseActivity<ArticleViewModel>(), IArticleView {
@@ -49,6 +52,7 @@ class RootActivity : BaseActivity<ArticleViewModel>(), IArticleView {
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     val bgColor by AttrValue(R.attr.colorSecondary)
+
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     val fgColor by AttrValue(R.attr.colorOnSecondary)
 
@@ -61,7 +65,7 @@ class RootActivity : BaseActivity<ArticleViewModel>(), IArticleView {
 
     override fun renderSearchResult(searchResult: List<Pair<Int, Int>>) {
         val content = tv_text_content.text as Spannable
-
+        tv_text_content.isVisible
         clearSearchResult()
 
         searchResult.forEach { (start, end) ->
@@ -80,7 +84,7 @@ class RootActivity : BaseActivity<ArticleViewModel>(), IArticleView {
         if (spans.isNotEmpty()) {
             val result = spans[searchPosition]
             Selection.setSelection(content, content.getSpanStart(result))
-            content.setSpan(SearchFocusSpan(bgColor, fgColor), content.getSpanStart(result), content.getSpanEnd(result), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            content.setSpan(SearchFocusSpan(bgColor, fgColor), content.getSpanStart(result), content.getSpanEnd(result), SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE)
         }
     }
 
@@ -141,22 +145,23 @@ class RootActivity : BaseActivity<ArticleViewModel>(), IArticleView {
         return super.onCreateOptionsMenu(menu)
     }
 
-    override fun renderNotification(notify: BaseViewModel.Notify) {
+    override fun renderNotification(notify: Notify) {
         val snackbar = Snackbar.make(coordinator_container, notify.message, Snackbar.LENGTH_LONG)
             .setAnchorView(bottombar)
 
         when (notify) {
-            is BaseViewModel.Notify.TextMessage -> { /*nothing*/
+            is Notify.TextMessage -> { /*nothing*/
             }
 
-            is BaseViewModel.Notify.ActionMessage -> {
+            //
+            is Notify.ActionMessage -> {
                 snackbar.setActionTextColor(getColor(R.color.color_accent_dark))
                 snackbar.setAction(notify.actionLabel) {
                     notify.actionHandler?.invoke()
                 }
             }
 
-            is BaseViewModel.Notify.ErrorMessage -> {
+            is Notify.ErrorMessage -> {
                 with(snackbar) {
                     setBackgroundTint(getColor(R.color.design_default_color_error))
                     setTextColor(getColor(android.R.color.white))
