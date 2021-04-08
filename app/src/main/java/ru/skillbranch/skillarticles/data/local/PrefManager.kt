@@ -6,9 +6,8 @@ import androidx.preference.PreferenceManager
 import ru.skillbranch.skillarticles.data.delegates.PrefDelegate
 
 class PrefManager(context: Context) {
-        val preferences : SharedPreferences by lazy { PreferenceManager(context).sharedPreferences }
-
-        fun clearAll() { preferences.edit().clear().apply() }
+        internal val preferences: SharedPreferences
+                by lazy { PreferenceManager(context).sharedPreferences }
 
         var storedBoolean by PrefDelegate(false)
         var storedString by PrefDelegate("test")
@@ -16,4 +15,7 @@ class PrefManager(context: Context) {
         var storedLong by PrefDelegate(Long.MAX_VALUE)
         var storedFloat by PrefDelegate(100f)
 
+        fun clearAll() {
+                preferences.edit().clear().apply()
+        }
 }

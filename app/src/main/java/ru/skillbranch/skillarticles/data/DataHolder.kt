@@ -39,7 +39,7 @@ object LocalDataHolder {
         GlobalScope.launch {
             if (isDelay) delay(500)
             withContext(Dispatchers.Main){
-                articleInfo.value = ArticlePersonalInfo(isBookMark = true)
+                articleInfo.value = ArticlePersonalInfo(isBookmark = true)
             }
         }
         return articleInfo
@@ -58,7 +58,6 @@ object LocalDataHolder {
     fun clearData(){
         articleInfo.postValue(null)
         articleData.postValue(null)
-        settings.postValue(AppSettings())
     }
 
     @VisibleForTesting(otherwise = VisibleForTesting.NONE)
@@ -78,6 +77,7 @@ object NetworkDataHolder {
             withContext(Dispatchers.Main){
                 content.value = listOf(longText)
             }
+
         }
         return content
     }
@@ -106,7 +106,7 @@ data class ArticleData(
 
 data class ArticlePersonalInfo(
     val isLike: Boolean = false,
-    val isBookMark: Boolean = false
+    val isBookmark: Boolean = false
 )
 
 data class AppSettings(

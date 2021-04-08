@@ -1,5 +1,15 @@
 package ru.skillbranch.skillarticles.extensions
 
+fun String?.indexesOf(substr: String, ignoreCase: Boolean = true) =
+    when {
+        this == null || substr.isEmpty() -> listOf()
+        else -> substr
+            .run { if (ignoreCase) toRegex(RegexOption.IGNORE_CASE) else toRegex() }
+            .findAll(this)
+            .map { it.range.first }
+            .toList()
+    }
+
 /*fun String?.indexesOf(query: String): List<Int> {
     if (this.isNullOrEmpty()) return emptyList()
     var removingString = this
@@ -14,13 +24,3 @@ package ru.skillbranch.skillarticles.extensions
     }
     return resultList
 }*/
-
-fun String?.indexesOf(substr: String, ignoreCase: Boolean = true) =
-    when {
-        this == null || substr.isEmpty() -> listOf()
-        else -> substr
-            .run { if (ignoreCase) toRegex(RegexOption.IGNORE_CASE) else toRegex() }
-            .findAll(this)
-            .map { it.range.first }
-            .toList()
-    }

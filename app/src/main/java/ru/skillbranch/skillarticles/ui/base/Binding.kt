@@ -18,7 +18,7 @@ abstract class Binding {
           vararg fields: KProperty<*>,
           onChange: (A, B, C, D) -> Unit
      ) {
-          check(fields.size == 4) {"Name size must be 4, current ${fields.size}"}
+          check(fields.size == 4) { "Names size must be 4, current ${fields.size}" }
           val names = fields.map { it.name }
 
           names.forEach {
@@ -28,11 +28,8 @@ abstract class Binding {
                          delegates[names[1]]?.value as B,
                          delegates[names[2]]?.value as C,
                          delegates[names[3]]?.value as D
-
                     )
                }
           }
      }
-
-
 }
