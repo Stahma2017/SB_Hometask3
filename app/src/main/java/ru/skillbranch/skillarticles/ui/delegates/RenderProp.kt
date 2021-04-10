@@ -30,7 +30,7 @@ class RenderProp<T>(
 }
 
 
-class ObserveProp<T: Any>(private val value: T, private val onChange: ((T) -> Unit)? = null) {
+class ObserveProp<T: Any>(private var value: T, private val onChange: ((T) -> Unit)? = null) {
     //provide delegate (when by call)
     operator fun provideDelegate(
         thisRef : Binding,
