@@ -15,7 +15,7 @@ interface IArticleViewModel {
     fun handleSearchMode(isSearchMode: Boolean)
     fun handleSearch(query: String?)
 
-    fun getArticleContent(): LiveData<List<Any>?>
+    fun getArticleContent(): LiveData<String?>
     fun getArticleData(): LiveData<ArticleData?>
     fun getArticlePersonalInfo(): LiveData<ArticlePersonalInfo?>
 }
