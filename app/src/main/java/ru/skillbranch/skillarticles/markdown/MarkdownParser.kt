@@ -3,25 +3,24 @@ package ru.skillbranch.skillarticles.markdown
 import java.util.regex.Pattern
 
 object MarkdownParser {
-
-    private val LINE_SEPARATOR = "\n"
+    private val LINE_SEPARATOR = System.getProperty("line.separator") ?: "\n"
 
     //group regex
     private const val UNORDERED_LIST_ITEM_GROUP = "(^[*+-] .+$)"
-    private const val HEADER_GROUP = "^#{1,6} .+?$"
-    private const val QUOTE_GROUP = "^> .+?$"
-    private const val ITALIC_GROUP = "" //TODO implement me
-    private const val BOLD_GROUP ="" //TODO implement me
-    private const val STRIKE_GROUP = "" //TODO implement me
-    private const val RULE_GROUP = "" //TODO implement me
-    private const val INLINE_GROUP = "" //TODO implement me
-    private const val LINK_GROUP = "" //TODO implement me
+    private const val HEADER_GROUP = "(^#{1,6} .+?$)"
+    private const val QUOTE_GROUP = "(^> .+?$)"
+    private const val ITALIC_GROUP = "((?<!\\*)\\*[^*].*?[^*]?\\*(?!\\*)|(?<!_)_[^_].*?[^_]?_(?!_))"
+    private const val BOLD_GROUP ="((?<!\\*)\\*{2}[^*].*?[^*]?\\*{2}(?!\\*)|(?<!_)_{2}[^_].*?[^_]?_{2}(?!_))"
+    private const val RULE_GROUP = "(^[-_*]{3}$)"
+    private const val STRIKE_GROUP = "(implement me)"
+    private const val INLINE_GROUP = "((?<!`)`[^`\\s].*?[^`\\s]?`(?!`))"
+    private const val LINK_GROUP = "(\\[[^\\[\\]]*?]\\(.+?\\)|^\\[*?]\\(.*?\\))"
     private const val BLOCK_CODE_GROUP = "" //TODO implement me
     private const val ORDER_LIST_GROUP = "" //TODO implement me
 
     //result regex
-    private const val MARKDOWN_GROUPS = "$UNORDERED_LIST_ITEM_GROUP|$HEADER_GROUP|$QUOTE_GROUP"
-            /*"|$ITALIC_GROUP|$BOLD_GROUP|$STRIKE_GROUP|$RULE_GROUP|$INLINE_GROUP|$LINK_GROUP"*/
+    const val MARKDOWN_GROUPS = "$UNORDERED_LIST_ITEM_GROUP|$HEADER_GROUP|$QUOTE_GROUP|$ITALIC_GROUP" +
+            "|$BOLD_GROUP|$STRIKE_GROUP|$RULE_GROUP|$INLINE_GROUP|$LINK_GROUP"
     //|$BLOCK_CODE_GROUP|$ORDER_LIST_GROUP optionally
 
     private val elementsPattern by lazy { Pattern.compile(MARKDOWN_GROUPS, Pattern.MULTILINE) }
@@ -55,7 +54,7 @@ object MarkdownParser {
 
             var text: CharSequence
 
-            val groups = 1..3
+            val groups = 1..9
             var group = -1
 
             for(gr in groups) {
@@ -90,6 +89,7 @@ object MarkdownParser {
                     lastStartIndex = endIndex
                 }
 
+                //QUOTE
                 3 -> {
                     //text without "> "
                     text = string.subSequence(startIndex.plus(2), endIndex)
@@ -99,49 +99,65 @@ object MarkdownParser {
                     lastStartIndex = endIndex
                 }
 
-                /*
-
-                //QUOTE
-                3 -> {
-                    //text without "> "
-                    //TODO implement me
-                }
-
                 //ITALIC
                 4 -> {
                     //text without "*{}*"
-                    //TODO implement me
+                    text = string.subSequence(startIndex.inc(), endIndex.dec())
+                    val subelements = findElements(text)
+                    val element = Element.Italic(text, subelements)
+                    parents.add(element)
+                    lastStartIndex = endIndex
                 }
 
                 //BOLD
                 5 -> {
                     //text without "**{}**"
-                    //TODO implement me
+                    text = string.subSequence(startIndex.plus(2), endIndex.plus(-2))
+                    val subelements = findElements(text)
+                    val element = Element.Bold(text, subelements)
+                    parents.add(element)
+                    lastStartIndex = endIndex
                 }
 
-                //STRIKE
                 6 -> {
                     //text without "~~{}~~"
-                    //TODO implement me
+                    text = string.subSequence(startIndex.plus(2), endIndex.plus(-2))
+                    val subelements = findElements(text)
+                    val element = Element.Strike(text, subelements)
+                    parents.add(element)
+                    lastStartIndex = endIndex
                 }
 
                 //RULE
                 7 -> {
                     //text without "***" insert empty character
-                    //TODO implement me
+                    val element = Element.Rule()
+                    parents.add(element)
+                    lastStartIndex = endIndex
                 }
 
                 //RULE
                 8 -> {
                     //text without "`{}`"
-                    //TODO implement me
+                    text = string.subSequence(startIndex.inc(), endIndex.dec())
+                    val element = Element.InlineCode(text)
+                    parents.add(element)
+                    lastStartIndex = endIndex
                 }
 
                 //LINK
                 9 -> {
                     //full text for regex
-                    //TODO implement me
+                    text = string.subSequence(startIndex, endIndex)
+                    val (title: String, link: String) = "\\[(.*)]\\((.*)\\)".toRegex().find(text)!!.destructured
+                    val element = Element.Link(link, title)
+                    parents.add(element)
+                    lastStartIndex = endIndex
                 }
+
+
+                /*
+
                 //10 -> BLOCK CODE - optionally
                 10 -> {
                     //TODO implement me
