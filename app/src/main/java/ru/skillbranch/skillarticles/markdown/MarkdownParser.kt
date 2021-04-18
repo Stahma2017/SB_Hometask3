@@ -12,7 +12,7 @@ object MarkdownParser {
     private const val ITALIC_GROUP = "((?<!\\*)\\*[^*].*?[^*]?\\*(?!\\*)|(?<!_)_[^_].*?[^_]?_(?!_))"
     private const val BOLD_GROUP ="((?<!\\*)\\*{2}[^*].*?[^*]?\\*{2}(?!\\*)|(?<!_)_{2}[^_].*?[^_]?_{2}(?!_))"
     private const val RULE_GROUP = "(^[-_*]{3}$)"
-    private const val STRIKE_GROUP = "(implement me)"
+    private const val STRIKE_GROUP = "((?<!~)~{2}[^~].*?[^~]?~{2}(?!~))"
     private const val INLINE_GROUP = "((?<!`)`[^`\\s].*?[^`\\s]?`(?!`))"
     private const val LINK_GROUP = "(\\[[^\\[\\]]*?]\\(.+?\\)|^\\[*?]\\(.*?\\))"
     private const val BLOCK_CODE_GROUP = "" //TODO implement me
@@ -36,7 +36,37 @@ object MarkdownParser {
 
 
     fun clear(string: String?): String? {
-        return null
+        var result: String? = null
+        if (string == null) return result
+        val elements = findElements(string)
+
+        elements
+            .fold(mutableListOf<Element>()) { acc, el ->
+                acc.also { it.addAll(el.spread()) }
+            }
+            .map { it.text.toString() }
+
+        elements.forEach {
+            result += it.text
+        }
+        return result
+    }
+
+    private fun Element.spread(): List<Element> {
+        val elements = mutableListOf<Element>()
+        elements.add(this)
+        elements.addAll(this.elements.spread())
+        return elements
+    }
+
+    private fun List<Element>.spread() : List<Element> {
+        val elements = mutableListOf<Element>()
+
+        if (this.isNotEmpty()) elements.addAll(
+            this.fold(mutableListOf()) { acc, el -> acc.also { it.addAll(el.spread()) }}
+        )
+
+        return elements
     }
 
     private fun findElements(string: CharSequence): List<Element> {
@@ -128,7 +158,6 @@ object MarkdownParser {
                     lastStartIndex = endIndex
                 }
 
-                //RULE
                 7 -> {
                     //text without "***" insert empty character
                     val element = Element.Rule()
@@ -136,7 +165,6 @@ object MarkdownParser {
                     lastStartIndex = endIndex
                 }
 
-                //RULE
                 8 -> {
                     //text without "`{}`"
                     text = string.subSequence(startIndex.inc(), endIndex.dec())
