@@ -58,7 +58,6 @@ class MarkdownBuilder(context: Context) {
                     inSpans(BlockquotesSpan(gap, quoteWidth, colorSecondary), StyleSpan(Typeface.ITALIC)) {
                         for (child in element.elements) {
                             buildElement(child, builder)
-
                         }
                     }
                 }
@@ -109,6 +108,14 @@ class MarkdownBuilder(context: Context) {
                     inSpans(IconLinkSpan(linkIcon, colorSecondary, gap, colorPrimary, strikeWidth),
                     URLSpan(element.link)) {
                         append(element.text)
+                    }
+                }
+
+                is Element.OrderedListItem -> {
+                    inSpans(OrderedListSpan(gap, element.order, colorPrimary)) {
+                        for (child in element.elements) {
+                            buildElement(child, builder)
+                        }
                     }
                 }
 

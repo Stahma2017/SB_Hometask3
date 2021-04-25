@@ -200,11 +200,6 @@ object MarkdownParser {
                 /*
 
                 //10 -> BLOCK CODE - optionally
-                10 -> {
-                    //TODO implement me
-                }
-
-                //11 -> NUMERIC LIST
                 11 -> {
                     //TODO implement me
                 }*/
