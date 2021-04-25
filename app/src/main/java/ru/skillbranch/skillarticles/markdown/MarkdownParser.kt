@@ -1,6 +1,5 @@
 package ru.skillbranch.skillarticles.markdown
 
-import android.util.Log
 import androidx.annotation.VisibleForTesting
 import java.util.regex.Pattern
 
@@ -17,13 +16,14 @@ object MarkdownParser {
     private const val STRIKE_GROUP = "((?<!~)~{2}[^~].*?[^~]?~{2}(?!~))"
     private const val INLINE_GROUP = "((?<!`)`[^`\\s].*?[^`\\s]?`(?!`))"
     private const val LINK_GROUP = "(\\[[^\\[\\]]*?]\\(.+?\\)|^\\[*?]\\(.*?\\))"
-    private const val BLOCK_CODE_GROUP = "" //TODO implement me
+    private const val BLOCK_CODE_GROUP = "(```[^```].*?[^```]?```)"  //todo me
     private const val ORDER_LIST_GROUP = "(^\\d+\\. .+$)"
 
     //result regex
     const val MARKDOWN_GROUPS = "$UNORDERED_LIST_ITEM_GROUP|$HEADER_GROUP|$QUOTE_GROUP|$ITALIC_GROUP" +
             "|$BOLD_GROUP|$STRIKE_GROUP|$RULE_GROUP|$INLINE_GROUP|$LINK_GROUP|$ORDER_LIST_GROUP"
-    //|$BLOCK_CODE_GROUP|$ORDER_LIST_GROUP optionally
+
+    //|$BLOCK_CODE_GROUP
 
     private val elementsPattern by lazy { Pattern.compile(MARKDOWN_GROUPS, Pattern.MULTILINE) }
 
@@ -196,13 +196,14 @@ object MarkdownParser {
                     lastStartIndex = endIndex
                 }
 
-
-                /*
-
-                //10 -> BLOCK CODE - optionally
-                11 -> {
-                    //TODO implement me
+                /*11 -> {
+                    text = string.subSequence(startIndex.plus(3), endIndex.plus(-3))
+                    val subelements = findElements(text)
+                    val element = Element.BlockCode(text = text, elements = subelements)
+                    parents.add(element)
+                    lastStartIndex = endIndex
                 }*/
+
             }
         }
         if (lastStartIndex<string.length) {
