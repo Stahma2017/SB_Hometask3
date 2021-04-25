@@ -1,5 +1,7 @@
 package ru.skillbranch.skillarticles.markdown
 
+import android.util.Log
+import androidx.annotation.VisibleForTesting
 import java.util.regex.Pattern
 
 object MarkdownParser {
@@ -36,22 +38,20 @@ object MarkdownParser {
 
 
     fun clear(string: String?): String? {
-        var result: String? = null
-        if (string == null) return result
+        if (string == null) return null
+        var result = ""
         val elements = findElements(string)
 
-        elements
-            .fold(mutableListOf<Element>()) { acc, el ->
-                acc.also { it.addAll(el.spread()) }
-            }
-            .map { it.text.toString() }
+        val clearedElements =elements.spread()
 
-        elements.forEach {
+        clearedElements.forEach {
+            if (it.elements.isEmpty())
             result += it.text
         }
         return result
     }
 
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     private fun Element.spread(): List<Element> {
         val elements = mutableListOf<Element>()
         elements.add(this)
@@ -59,6 +59,7 @@ object MarkdownParser {
         return elements
     }
 
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     private fun List<Element>.spread() : List<Element> {
         val elements = mutableListOf<Element>()
 
@@ -69,7 +70,8 @@ object MarkdownParser {
         return elements
     }
 
-    private fun findElements(string: CharSequence): List<Element> {
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    fun findElements(string: CharSequence): List<Element> {
         val parents = mutableListOf<Element>()
         val matcher = elementsPattern.matcher(string)
         var lastStartIndex = 0
