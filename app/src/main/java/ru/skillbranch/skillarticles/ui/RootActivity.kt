@@ -50,7 +50,6 @@ class RootActivity : BaseActivity<ArticleViewModel>(), IArticleView {
         ViewModelProvider(this, vmFactory).get(ArticleViewModel::class.java)
     }
 
-
     @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
     public override val binding: ArticleBinding by lazy { ArticleBinding() }
 
