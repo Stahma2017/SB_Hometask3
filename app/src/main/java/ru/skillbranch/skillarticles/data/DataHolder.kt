@@ -54,7 +54,7 @@ object NetworkDataHolder {
     fun loadArticleContent(articleId: String): LiveData<String?> {
         GlobalScope.launch {
             delay(500)
-            content.postValue(null)
+            content.postValue(longText)
         }
         return content
     }
