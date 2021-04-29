@@ -36,10 +36,9 @@ class MarkdownBuilder(context: Context) {
     private val strikeWidth = context.dpToPx(4)
 
 
-    fun markdownToSpan(string: String): SpannedString {
-        val markdown = MarkdownParser.parse(string)
+    fun markdownToSpan(textContent: MarkdownElement.Text): SpannedString {
         return buildSpannedString {
-            markdown.elements.forEach { buildElement(it, this) }
+            textContent.elements.forEach { buildElement(it, this) }
         }
     }
 
@@ -120,7 +119,7 @@ class MarkdownBuilder(context: Context) {
                     }
                 }
 
-                is Element.BlockCode -> {
+                /*is Element.BlockCode -> {
                     inSpans(
                         BlockCodeSpan(
                             colorOnSurface, colorSurface, cornerRadius, gap, element.type
@@ -128,7 +127,7 @@ class MarkdownBuilder(context: Context) {
                     ) {
                         append(element.text)
                     }
-                }
+                }*/
 
             }
         }

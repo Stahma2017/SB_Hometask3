@@ -27,6 +27,7 @@ import ru.skillbranch.skillarticles.extensions.setMarginOptionally
 import ru.skillbranch.skillarticles.ui.custom.markdown.MarkdownBuilder
 import ru.skillbranch.skillarticles.ui.base.BaseActivity
 import ru.skillbranch.skillarticles.ui.base.Binding
+import ru.skillbranch.skillarticles.ui.custom.markdown.MarkdownElement
 import ru.skillbranch.skillarticles.ui.custom.spans.SearchFocusSpan
 import ru.skillbranch.skillarticles.ui.custom.spans.SearchSpan
 import ru.skillbranch.skillarticles.ui.delegates.AttrValue
@@ -56,17 +57,17 @@ class RootActivity : BaseActivity<ArticleViewModel>(), IArticleView {
     }
 
     override fun renderSearchResult(searchResult: List<Pair<Int, Int>>) {
-        val content = tv_text_content.text as Spannable
+       /* val content = tv_text_content.text as Spannable
         tv_text_content.isVisible
         clearSearchResult()
 
         searchResult.forEach { (start, end) ->
             content.setSpan(SearchSpan(), start, end, SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE)
-        }
+        }*/
     }
 
     override fun renderSearchPosition(searchPosition: Int) {
-        val content = tv_text_content.text as Spannable
+        /*val content = tv_text_content.text as Spannable
 
         val spans = content.getSpans<SearchSpan>()
         content.getSpans<SearchFocusSpan>().forEach { content.removeSpan(it) }
@@ -75,13 +76,14 @@ class RootActivity : BaseActivity<ArticleViewModel>(), IArticleView {
             val result = spans[searchPosition]
             Selection.setSelection(content, content.getSpanStart(result))
             content.setSpan(SearchFocusSpan(), content.getSpanStart(result), content.getSpanEnd(result), SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE)
-        }
+        }*/
     }
 
     override fun clearSearchResult() {
-        val content = tv_text_content.text as Spannable
+        /*val content = tv_text_content.text as Spannable
         content.getSpans<SearchSpan>()
-            .forEach { content.removeSpan(it) }
+            .forEach { content.removeSpan(it) }*/
+
     }
 
     override fun showSearchBar() {
@@ -215,6 +217,7 @@ class RootActivity : BaseActivity<ArticleViewModel>(), IArticleView {
 
         private var isLoadingContent by ObserveProp(true)
 
+
         private var isLike : Boolean by RenderProp(false) { btn_like.isChecked = it}
         private var isBookmark : Boolean by RenderProp(false) { btn_bookmark.isChecked = it}
         private var isShowMenu : Boolean by RenderProp(false) {
@@ -228,11 +231,11 @@ class RootActivity : BaseActivity<ArticleViewModel>(), IArticleView {
 
         private var isBigText : Boolean by RenderProp(false) {
             if (it) {
-                tv_text_content.textSize = 18f
+               // tv_text_content.textSize = 18f
                 btn_text_up.isChecked = true
                 btn_text_down.isChecked = false
             } else {
-                tv_text_content.textSize = 14f
+             //   tv_text_content.textSize = 14f
                 btn_text_up.isChecked = false
                 btn_text_down.isChecked = true
             }
@@ -251,13 +254,9 @@ class RootActivity : BaseActivity<ArticleViewModel>(), IArticleView {
         private var searchResults: List<Pair<Int, Int>> by ObserveProp(emptyList())
         private var searchPosition: Int by ObserveProp(0)
 
-        private var content: String by ObserveProp("loading") {
-            MarkdownBuilder(this@RootActivity)
-                .markdownToSpan(it)
-                .run {
-                    tv_text_content.setText(this, TextView.BufferType.SPANNABLE)
-                }
-            tv_text_content.movementMethod = LinkMovementMethod.getInstance()
+        private var content: List<MarkdownElement> by ObserveProp(emptyList()) {
+            tv_text_content.isLoading = it.isEmpty()
+            tv_text_content.setContent(it)
         }
 
         override fun onFinishInflate() {
@@ -292,7 +291,7 @@ class RootActivity : BaseActivity<ArticleViewModel>(), IArticleView {
             if (data.title != null) title = data.title
             if (data.category != null) category = data.category
             if (data.categoryIcon != null) categoryIcon = data.categoryIcon as Int
-            if (data.content != null) content = data.content
+            content = data.content
 
             isLoadingContent = data.isLoadingContent
             isSearch = data.isSearch

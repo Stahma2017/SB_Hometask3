@@ -1,4 +1,9 @@
 package ru.skillbranch.skillarticles.ui.custom.markdown
 
-class IMarkdownView {
+import android.text.Spannable
+
+interface IMarkdownView  {
+    var fontSize : Float
+    val spannableContent : Spannable
+
 }
