@@ -145,6 +145,10 @@ class ArticleViewModel(private val articleId: String) : BaseViewModel<ArticleSta
     fun handleUpResult() {
         updateState { it.copy(searchPosition = it.searchPosition.dec()) }
     }
+
+    fun handleCopyCode() {
+        notify(Notify.TextMessage("Code copy to clipboard"))
+    }
 }
 
 data class ArticleState(
