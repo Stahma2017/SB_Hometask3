@@ -43,6 +43,7 @@ import ru.skillbranch.skillarticles.viewmodels.ArticleViewModel
 import ru.skillbranch.skillarticles.viewmodels.base.IViewModelState
 import ru.skillbranch.skillarticles.viewmodels.base.Notify
 import ru.skillbranch.skillarticles.viewmodels.base.ViewModelFactory
+import kotlin.properties.Delegates
 
 class RootActivity : BaseActivity<ArticleViewModel>(), IArticleView {
 

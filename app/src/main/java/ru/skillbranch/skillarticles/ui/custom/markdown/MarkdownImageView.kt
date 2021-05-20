@@ -27,7 +27,7 @@ import java.security.MessageDigest
 import kotlin.math.hypot
 
 @SuppressLint("ViewConstructor")
-class MarkdownImageView private constructor(
+open class MarkdownImageView private constructor(
     context: Context,
     fontSize : Float
 ) : ViewGroup(context, null, 0), IMarkdownView {
@@ -147,7 +147,7 @@ class MarkdownImageView private constructor(
     @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
     public override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         var usedHeight = 0
-        val width = View.getDefaultSize(suggestedMinimumHeight, widthMeasureSpec)
+        val width = View.getDefaultSize(suggestedMinimumWidth, widthMeasureSpec)
 
         //create measureSpec for children EXACTLY
         //all children width == parent width (constraint parent width)
@@ -168,7 +168,7 @@ class MarkdownImageView private constructor(
 
 
     @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
-    override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
+    public override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
         var usedHeight = 0
         val bodyWidth = r - l - paddingLeft - paddingRight
         val left = paddingLeft
@@ -181,7 +181,8 @@ class MarkdownImageView private constructor(
         tv_alt?.layout(left, iv_image.measuredHeight - (tv_alt?.measuredHeight ?: 0), right, iv_image.measuredHeight)
     }
 
-    override fun dispatchDraw(canvas: Canvas) {
+    @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
+    public override fun dispatchDraw(canvas: Canvas) {
         super.dispatchDraw(canvas)
         canvas.drawLine(0f, linePositionY, titlePadding.toFloat(), linePositionY, linePaint)
         canvas.drawLine(canvas.width - titlePadding.toFloat(), linePositionY, canvas.width.toFloat(), linePositionY, linePaint)

@@ -25,7 +25,7 @@ class MarkdownCodeView private constructor(
     fontSize: Float
 ) : ViewGroup(context, null, 0), IMarkdownView {
 
-    override var fontSize: Float
+    override var fontSize: Float = fontSize
         set(value) {
             tv_codeView.textSize = value * 0.85f
             field = value
@@ -159,7 +159,7 @@ class MarkdownCodeView private constructor(
     }
 
     @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
-    override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
+    public override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
         val usedHeight = paddingTop
         val bodyWidth = r - l - paddingLeft - paddingRight
         val left = paddingLeft

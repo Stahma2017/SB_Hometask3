@@ -6,7 +6,6 @@ import android.graphics.Rect
 import android.text.Spannable
 import android.text.Spanned
 import android.text.method.LinkMovementMethod
-import android.util.AttributeSet
 import android.widget.TextView
 import androidx.core.graphics.withTranslation
 import ru.skillbranch.skillarticles.R
@@ -15,7 +14,8 @@ import ru.skillbranch.skillarticles.extensions.dpToIntPx
 
 class MarkdownTextView constructor(
     context: Context,
-    fontSize: Float
+    fontSize: Float,
+    mockHelper: SearchBgHelper? = null // for mock
 ) : TextView(context, null, 0), IMarkdownView {
 
     override var fontSize: Float = fontSize

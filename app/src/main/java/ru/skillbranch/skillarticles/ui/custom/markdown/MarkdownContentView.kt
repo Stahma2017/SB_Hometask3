@@ -5,10 +5,12 @@ import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.core.view.children
 import ru.skillbranch.skillarticles.extensions.dpToIntPx
 import ru.skillbranch.skillarticles.extensions.groupByBounds
 import ru.skillbranch.skillarticles.extensions.setPaddingOptionally
 import kotlin.properties.Delegates
+import kotlin.reflect.KProperty
 
 class MarkdownContentView @JvmOverloads constructor(
     context: Context,
@@ -16,18 +18,18 @@ class MarkdownContentView @JvmOverloads constructor(
     diffStyleAttr: Int = 0
 ): ViewGroup(context, attrs, diffStyleAttr) {
     lateinit var elements: List<MarkdownElement>
-    private val children : MutableList<View> = mutableListOf()
 
     //for restore
     private var ids = arrayListOf<Int>()
 
-    var textSize = Delegates.observable(14f) { _, old, value ->
+    var textSize by Delegates.observable(14f) { _, old, value ->
         if (value == old) return@observable
-        children.forEach {
+        this.children.forEach {
             it as IMarkdownView
             it.fontSize = value
         }
     }
+
     var isLoading: Boolean = true
     val padding = context.dpToIntPx(8)
 
@@ -73,7 +75,7 @@ class MarkdownContentView @JvmOverloads constructor(
         content.forEach {
             when(it) {
                 is MarkdownElement.Text -> {
-                    val tv = MarkdownTextView(context, /*textSize*/ 14f).apply {
+                    val tv = MarkdownTextView(context, textSize).apply {
                         setPaddingOptionally(left = padding, right = padding)
                         setLineSpacing(fontSize*0.5f, 1f)
                     }
@@ -86,14 +88,13 @@ class MarkdownContentView @JvmOverloads constructor(
                 }
 
                 is MarkdownElement.Image -> {
-                    val iv = MarkdownImageView(context, /*textSize*/ 14f , it.image.url, it.image.text, it.image.alt)
+                    val iv = MarkdownImageView(context, textSize, it.image.url, it.image.text, it.image.alt)
                     addView(iv)
                 }
 
                 is MarkdownElement.Scroll -> {
-                    val sv = MarkdownCodeView(context, /*textSize*/ 14f, it.blockCode.text)
+                    val sv = MarkdownCodeView(context, textSize, it.blockCode.text)
                     addView(sv)
-
                 }
             }
         }
@@ -118,8 +119,7 @@ class MarkdownContentView @JvmOverloads constructor(
     }
 
     fun renderSearchPosition(
-        searchPosition: Pair<Int, Int>?,
-    ) {
+        searchPosition: Pair<Int, Int>?) {
         searchPosition ?: return
         val bounds = elements.map { it.bounds }
 
