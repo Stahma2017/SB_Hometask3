@@ -3,6 +3,8 @@ package ru.skillbranch.skillarticles.ui.custom.markdown
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.*
+import android.os.Parcel
+import android.os.Parcelable
 import android.text.Spannable
 import android.view.*
 import android.widget.ImageView
@@ -76,6 +78,10 @@ open class MarkdownImageView private constructor(
     @ColorInt
     private val lineColor: Int = context.getColor(R.color.color_divider)
 
+    // view state
+    var isOpen:Boolean = false
+    var aspectRatio = 0f
+
     //for draw object allocation
     private var linePositionY: Float = 0f
     private val linePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
@@ -130,7 +136,7 @@ open class MarkdownImageView private constructor(
                 gravity = Gravity.CENTER
                 textSize = fontSize
                 setPadding(titleTopMargin)
-                isVisible = false
+                isVisible = isOpen
             }
         }
 
@@ -143,6 +149,34 @@ open class MarkdownImageView private constructor(
 
     }
 
+    // Saving state
+    override fun onSaveInstanceState(): Parcelable? {
+        val savedState = SavedState(super.onSaveInstanceState())
+        savedState.ssIsOpen = isOpen
+        savedState.ssAspectRatio = (iv_image.width.toFloat()/iv_image.height)
+        return savedState
+    }
+
+    override fun onRestoreInstanceState(state: Parcelable?) {
+        super.onRestoreInstanceState(state)
+        if (state is SavedState) {
+            isOpen = state.ssIsOpen
+            aspectRatio = state.ssAspectRatio
+            setAltVisibility()
+        }
+    }
+
+    private fun setAltVisibility() {
+        tv_alt?.isVisible = isOpen
+    }
+
+    private fun toggleAltVisibility() {
+        tv_alt?.let {
+            if (it.isVisible) animateHideAlt()
+            else animateShowAlt()
+            isOpen = it.isVisible
+        }
+    }
 
     @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
     public override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -243,5 +277,32 @@ open class MarkdownImageView private constructor(
         override fun equals(other: Any?): Boolean = other is AspectRatioResizeTransform
         override fun hashCode(): Int = ID.hashCode()
 
+    }
+
+    private class SavedState : BaseSavedState, Parcelable {
+
+        var ssIsOpen: Boolean = false
+        var ssAspectRatio: Float = 0f
+
+
+        constructor(superState: Parcelable?) : super(superState)
+
+        constructor(src: Parcel) : super(src) {
+            ssIsOpen = src.readInt() == 1
+            ssAspectRatio = src.readFloat()
+        }
+
+        override fun writeToParcel(dst: Parcel, flags: Int) {
+            super.writeToParcel(dst, flags)
+            dst.writeInt(if (ssIsOpen) 1 else 0)
+            dst.writeFloat(ssAspectRatio)
+        }
+
+        override fun describeContents() = 0
+
+        companion object CREATOR : Parcelable.Creator<SavedState> {
+            override fun createFromParcel(parcel: Parcel) = SavedState(parcel)
+            override fun newArray(size: Int): Array<SavedState?> = arrayOfNulls(size)
+        }
     }
 }
