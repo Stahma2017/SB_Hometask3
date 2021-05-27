@@ -1,6 +1,10 @@
 package ru.skillbranch.skillarticles.ui
 
+import android.os.Bundle
 import androidx.activity.viewModels
+import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.ui.setupActionBarWithNavController
+import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_root.*
 import ru.skillbranch.skillarticles.R
@@ -15,7 +19,19 @@ class RootActivity : BaseActivity<RootViewModel>() {
     override val viewModel: RootViewModel by viewModels()
 
 
-
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        val appbarConfiguration = AppBarConfiguration(
+            setOf(
+                R.id.nav_articles,
+                R.id.nav_bookmarks,
+                R.id.nav_transcriptions,
+                R.id.nav_profile
+            )
+        )
+        setupActionBarWithNavController(navController, appbarConfiguration)
+        nav_view.setupWithNavController(navController)
+    }
 
 
     override fun renderNotification(notify: Notify) {

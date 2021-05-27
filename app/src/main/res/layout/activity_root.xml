@@ -21,8 +21,6 @@
             android:elevation="4dp"
             android:theme="@style/ArticleBarsTheme"
             app:layout_scrollFlags="scroll|enterAlwaysCollapsed"
-            app:logo="@drawable/logo_placeholder"
-            app:subtitle="loading..."
             app:title="@string/app_name" />
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -32,7 +30,16 @@
         android:layout_height="match_parent"
         android:name="androidx.navigation.fragment.NavHostFragment"
         app:defaultNavHost="true"
+        app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"
         app:navGraph="@navigation/mobile_navigation"/>
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/nav_view"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:layout_gravity="bottom"
+        app:menu="@menu/bottom_nav_menu"
+        app:layout_behavior="com.google.android.material.behavior.HideBottomViewOnScrollBehavior"/>
 
 
 
