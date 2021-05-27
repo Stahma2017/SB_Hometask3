@@ -4,21 +4,32 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
+import android.view.MenuItem
 import androidx.annotation.VisibleForTesting
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.appcompat.content.res.AppCompatResources.getDrawable
+import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.RequestOptions.circleCropTransform
+import com.google.android.material.appbar.AppBarLayout
 import kotlinx.android.synthetic.main.fragment_article.*
+import kotlinx.android.synthetic.main.layout_bottombar.*
+import kotlinx.android.synthetic.main.layout_bottombar.view.*
+import kotlinx.android.synthetic.main.layout_submenu.*
+import kotlinx.android.synthetic.main.layout_submenu.view.*
 import kotlinx.android.synthetic.main.search_view_layout.*
 import ru.skillbranch.skillarticles.R
 import ru.skillbranch.skillarticles.extensions.dpToIntPx
 import ru.skillbranch.skillarticles.extensions.format
-import ru.skillbranch.skillarticles.ui.base.BaseFragment
-import ru.skillbranch.skillarticles.ui.base.Binding
+import ru.skillbranch.skillarticles.extensions.hideKeyboard
+import ru.skillbranch.skillarticles.extensions.setMarginOptionally
+import ru.skillbranch.skillarticles.ui.base.*
 import ru.skillbranch.skillarticles.ui.custom.markdown.MarkdownElement
 import ru.skillbranch.skillarticles.ui.delegates.RenderProp
 import ru.skillbranch.skillarticles.viewmodels.article.ArticleState
@@ -28,7 +39,7 @@ import ru.skillbranch.skillarticles.viewmodels.base.ViewModelFactory
 
 
 class ArticleFragment : BaseFragment<ArticleViewModel>(), IArticleView {
-    private val args : ArticleFragmentArgs by navArgs()
+    private val args: ArticleFragmentArgs by navArgs()
     override val viewModel: ArticleViewModel by viewModels {
         ViewModelFactory(
             owner = this,
@@ -37,16 +48,50 @@ class ArticleFragment : BaseFragment<ArticleViewModel>(), IArticleView {
     }
 
     @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
-    public override val binding: ArticleBinding by lazy { ArticleBinding() }
+    override val binding: ArticleBinding by lazy { ArticleBinding() }
+
+    override val prepareToolbar: (ToolbarBuilder.() -> Unit)? = {
+        this.setTitle(args.title)
+        setSubtitle(args.category)
+        setLogo(args.categoryIcon)
+        addMenuItem(
+            MenuItemHolder(
+                "search",
+                R.id.action_search,
+                R.drawable.ic_search_black_24dp,
+                R.layout.search_view_layout
+            )
+        )
+
+        addMenuItem(MenuItemHolder(
+            "something",
+            R.id.action_search + 1,
+            R.drawable.ic_account_circle_black_24dp,
+            clickListener = { menuItem ->
+                Log.e(
+                    "ArticleFragment",
+                    "click menu item: $menuItem"
+                )
+            }
+        ))
+    }
+
+    override val prepareBottombar: (BottombarBuilder.() -> Unit)? = {
+        this.addView(R.layout.layout_submenu)
+        addView(R.layout.layout_bottombar)
+        setVisibility(false)
+    }
 
     override val layout: Int = R.layout.fragment_article
 
     override fun showSearchBar() {
-        TODO("Not yet implemented")
+        bottombar.setSearchState(true)
+        scroll.setMarginOptionally(bottom = root.dpToIntPx(56))
     }
 
     override fun hideSearchBar() {
-        TODO("Not yet implemented")
+        bottombar.setSearchState(false)
+        scroll.setMarginOptionally(bottom = 0)
     }
 
     override fun setupViews() {
@@ -73,6 +118,17 @@ class ArticleFragment : BaseFragment<ArticleViewModel>(), IArticleView {
         tv_date.text = args.date.format()
     }
 
+    private val bottombar
+        get() = root.bottombar
+
+    private val submenu
+        get() = root.submenu
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
+    }
+
     /*
 
     override fun showSearchBar() {
@@ -87,20 +143,19 @@ class ArticleFragment : BaseFragment<ArticleViewModel>(), IArticleView {
 
     override fun onPrepareOptionsMenu(menu: Menu) {
         super.onPrepareOptionsMenu(menu)
-        /*menuInflater.inflate(R.menu.menu_article, menu)
-        val searchItem = menu?.findItem(R.id.action_search)
-        val searchView = (searchItem?.actionView as? SearchView)
-        searchView?.queryHint = "Article place holder"
+        val searchItem = menu.findItem(R.id.action_search)
+        val searchView = (searchItem?.actionView as SearchView)
+        searchView.queryHint = "Article place holder"
 
         if (binding.isSearch) {
-            searchItem?.expandActionView()
-            searchView?.setQuery(binding.searchQuery, false)
-            if (binding.isFocusedSearch) searchView?.requestLayout()
-            else searchView?.clearFocus()
+            searchItem.expandActionView()
+            searchView.setQuery(binding.searchQuery, false)
+            if (binding.isFocusedSearch) searchView.requestLayout()
+            else searchView.clearFocus()
         }
 
 
-        searchItem?.setOnActionExpandListener(object : MenuItem.OnActionExpandListener {
+        searchItem.setOnActionExpandListener(object : MenuItem.OnActionExpandListener {
             override fun onMenuItemActionExpand(item: MenuItem?): Boolean {
                 viewModel.handleSearchMode(true)
                 return true
@@ -122,44 +177,44 @@ class ArticleFragment : BaseFragment<ArticleViewModel>(), IArticleView {
                 viewModel.handleSearch(newText)
                 return true
             }
-        })*/
+        })
     }
 
     private fun setupSubmenu() {
-        /*btn_text_up.setOnClickListener { viewModel.handleUpText() }
-        btn_text_down.setOnClickListener { viewModel.handleDownText() }
-        switch_mode.setOnClickListener { viewModel.handleNightMode() }*/
+        submenu.btn_text_up.setOnClickListener { viewModel.handleUpText() }
+        submenu.btn_text_down.setOnClickListener { viewModel.handleDownText() }
+        submenu.switch_mode.setOnClickListener { viewModel.handleNightMode() }
     }
 
     private fun setupBottombar() {
-        /*btn_like.setOnClickListener { viewModel.handleLike() }
-        btn_bookmark.setOnClickListener { viewModel.handleBookmark() }
-        btn_share.setOnClickListener { viewModel.handleShare() }
-        btn_settings.setOnClickListener { viewModel.handleToggleMenu() }
+        bottombar.btn_like.setOnClickListener { viewModel.handleLike() }
+        bottombar.btn_bookmark.setOnClickListener { viewModel.handleBookmark() }
+        bottombar.btn_share.setOnClickListener { viewModel.handleShare() }
+        bottombar.btn_settings.setOnClickListener { viewModel.handleToggleMenu() }
 
-        btn_result_up.setOnClickListener {
+        bottombar.btn_result_up.setOnClickListener {
             if (!tv_text_content.hasFocus()) tv_text_content.requestFocus()
             root.hideKeyboard(btn_result_up)
             viewModel.handleUpResult()
         }
 
-        btn_result_down.setOnClickListener {
+        bottombar.btn_result_down.setOnClickListener {
             if (!tv_text_content.hasFocus()) tv_text_content.requestFocus()
             root.hideKeyboard(btn_result_down)
             viewModel.handleDownResult()
         }
 
-        btn_search_close.setOnClickListener {
+        bottombar.btn_search_close.setOnClickListener {
             viewModel.handleSearchMode(false)
             root.invalidateOptionsMenu()
-        }*/
+        }
     }
-
 
 
     private fun setupCopyListener() {
         tv_text_content.setCopyListener { copy ->
-            val clipboard = requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+            val clipboard =
+                requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
             val clip = ClipData.newPlainText("Copied code", copy)
             clipboard.setPrimaryClip(clip)
             viewModel.handleCopyCode()
@@ -173,37 +228,37 @@ class ArticleFragment : BaseFragment<ArticleViewModel>(), IArticleView {
         private var isLoadingContent by RenderProp(true)
 
 
-        /*private var isLike : Boolean by RenderProp(false) { btn_like.isChecked = it}
-        private var isBookmark : Boolean by RenderProp(false) { btn_bookmark.isChecked = it}
+        private var isLike : Boolean by RenderProp(false) { bottombar.btn_like.isChecked = it}
+        private var isBookmark : Boolean by RenderProp(false) { bottombar.btn_bookmark.isChecked = it}
         private var isShowMenu : Boolean by RenderProp(false) {
-            btn_settings.isChecked = it
+            bottombar.btn_settings.isChecked = it
             if (it) submenu.open() else submenu.close()
         }
 
-        *//*private var title: String by RenderProp("loading") { toolbar.title = it }
+       /* private var title: String by RenderProp("loading") { toolbar.title = it }
         private var category: String by RenderProp("loading") { toolbar.subtitle = it }
-        private var categoryIcon: Int by RenderProp(R.drawable.logo_placeholder) { toolbar.logo = getDrawable(it) }*//*
+        private var categoryIcon: Int by RenderProp(R.drawable.logo_placeholder) { toolbar.logo = getDrawable(it) }*/
 
         private var isBigText : Boolean by RenderProp(false) {
             if (it) {
                 tv_text_content.textSize = 18f
-                btn_text_up.isChecked = true
-                btn_text_down.isChecked = false
+                submenu.btn_text_up.isChecked = true
+                submenu.btn_text_down.isChecked = false
             } else {
                 tv_text_content.textSize = 14f
-                btn_text_up.isChecked = false
-                btn_text_down.isChecked = true
+                submenu.btn_text_up.isChecked = false
+                submenu.btn_text_down.isChecked = true
             }
         }
 
         private var isDarkMode : Boolean by RenderProp(false, false) {
-            switch_mode.isChecked = it
+            submenu.switch_mode.isChecked = it
             root.delegate.localNightMode = if (it) AppCompatDelegate.MODE_NIGHT_YES
             else AppCompatDelegate.MODE_NIGHT_NO
-        }*/
+        }
 
-        var isSearch : Boolean by RenderProp(false) {
-            /*if (it) {
+        var isSearch: Boolean by RenderProp(false) {
+            if (it) {
                 showSearchBar()
                 with(toolbar) {
                     (layoutParams as AppBarLayout.LayoutParams).scrollFlags = AppBarLayout.LayoutParams.SCROLL_FLAG_NO_SCROLL
@@ -215,7 +270,7 @@ class ArticleFragment : BaseFragment<ArticleViewModel>(), IArticleView {
                     (layoutParams as AppBarLayout.LayoutParams).scrollFlags = AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL or
                             AppBarLayout.LayoutParams.SCROLL_FLAG_ENTER_ALWAYS_COLLAPSED
                 }
-            }*/
+            }
         }
 
         private var searchResults: List<Pair<Int, Int>> by RenderProp(emptyList())
@@ -229,7 +284,7 @@ class ArticleFragment : BaseFragment<ArticleViewModel>(), IArticleView {
             }
         }
 
-        override val afterInflated : (() -> Unit)? = {
+        override val afterInflated: (() -> Unit)? = {
             dependsOn<Boolean, Boolean, List<Pair<Int, Int>>, Int>(
                 ::isLoadingContent,
                 ::isSearch,
@@ -244,7 +299,7 @@ class ArticleFragment : BaseFragment<ArticleViewModel>(), IArticleView {
                     tv_text_content.clearSearchResult()
                 }
 
-              //  bottombar.bindSearchInfo(sr.size, sp)
+                  bottombar.bindSearchInfo(sr.size, sp)
             }
         }
 
@@ -252,11 +307,11 @@ class ArticleFragment : BaseFragment<ArticleViewModel>(), IArticleView {
             data as ArticleState
 
 
-            /*isLike = data.isLike
+            isLike = data.isLike
             isBookmark = data.isBookmark
             isShowMenu = data.isShowMenu
             isBigText = data.isBigText
-            isDarkMode = data.isDarkMode*/
+            isDarkMode = data.isDarkMode
 
             content = data.content
 

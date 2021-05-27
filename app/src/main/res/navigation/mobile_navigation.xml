@@ -11,6 +11,7 @@
         android:label="ArticleFragment" >
         <argument
             android:name="article_id"
+            android:defaultValue="-1"
             app:argType="string" />
         <argument
             android:name="author"

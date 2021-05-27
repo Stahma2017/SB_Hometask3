@@ -55,7 +55,6 @@ class ArticlesFragment : BaseFragment<ArticlesViewModel>() {
         override fun bind(data: IViewModelState) {
             data as ArticlesState
             articles = data.articles
-
         }
     }
 
