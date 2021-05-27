@@ -12,6 +12,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.activity.viewModels
 import androidx.annotation.VisibleForTesting
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.SearchView
@@ -48,9 +49,11 @@ import kotlin.properties.Delegates
 class RootActivity : BaseActivity<ArticleViewModel>(), IArticleView {
 
     override val layout: Int = R.layout.activity_root
-    override val viewModel: ArticleViewModel by lazy {
-        val vmFactory = ViewModelFactory("0")
-        ViewModelProvider(this, vmFactory).get(ArticleViewModel::class.java)
+    override val viewModel: ArticleViewModel by viewModels {
+        ViewModelFactory(
+            owner = this,
+            params = "0"
+        )
     }
 
     @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
