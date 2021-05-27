@@ -4,7 +4,7 @@ import android.os.Bundle
 import androidx.core.os.bundleOf
 import androidx.lifecycle.*
 import androidx.savedstate.SavedStateRegistryOwner
-import ru.skillbranch.skillarticles.viewmodels.ArticleViewModel
+import ru.skillbranch.skillarticles.viewmodels.article.ArticleViewModel
 
 class ViewModelFactory(
     owner: SavedStateRegistryOwner,
