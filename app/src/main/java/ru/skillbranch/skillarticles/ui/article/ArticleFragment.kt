@@ -26,6 +26,7 @@ import ru.skillbranch.skillarticles.ui.base.BaseFragment
 import ru.skillbranch.skillarticles.ui.base.Binding
 import ru.skillbranch.skillarticles.ui.custom.markdown.MarkdownElement
 import ru.skillbranch.skillarticles.ui.delegates.RenderProp
+import ru.skillbranch.skillarticles.viewmodels.article.ArticleState
 import ru.skillbranch.skillarticles.viewmodels.article.ArticleViewModel
 import ru.skillbranch.skillarticles.viewmodels.base.IViewModelState
 import ru.skillbranch.skillarticles.viewmodels.base.ViewModelFactory
@@ -111,13 +112,13 @@ class ArticleFragment : BaseFragment<ArticleViewModel>(), IArticleView {
     }
 
     private fun setupSubmenu() {
-        btn_text_up.setOnClickListener { viewModel.handleUpText() }
+        /*btn_text_up.setOnClickListener { viewModel.handleUpText() }
         btn_text_down.setOnClickListener { viewModel.handleDownText() }
-        switch_mode.setOnClickListener { viewModel.handleNightMode() }
+        switch_mode.setOnClickListener { viewModel.handleNightMode() }*/
     }
 
     private fun setupBottombar() {
-        btn_like.setOnClickListener { viewModel.handleLike() }
+        /*btn_like.setOnClickListener { viewModel.handleLike() }
         btn_bookmark.setOnClickListener { viewModel.handleBookmark() }
         btn_share.setOnClickListener { viewModel.handleShare() }
         btn_settings.setOnClickListener { viewModel.handleToggleMenu() }
@@ -137,7 +138,7 @@ class ArticleFragment : BaseFragment<ArticleViewModel>(), IArticleView {
         btn_search_close.setOnClickListener {
             viewModel.handleSearchMode(false)
             root.invalidateOptionsMenu()
-        }
+        }*/
     }
 
 
@@ -158,16 +159,16 @@ class ArticleFragment : BaseFragment<ArticleViewModel>(), IArticleView {
         private var isLoadingContent by RenderProp(true)
 
 
-        private var isLike : Boolean by RenderProp(false) { btn_like.isChecked = it}
+        /*private var isLike : Boolean by RenderProp(false) { btn_like.isChecked = it}
         private var isBookmark : Boolean by RenderProp(false) { btn_bookmark.isChecked = it}
         private var isShowMenu : Boolean by RenderProp(false) {
             btn_settings.isChecked = it
             if (it) submenu.open() else submenu.close()
         }
 
-        /*private var title: String by RenderProp("loading") { toolbar.title = it }
+        *//*private var title: String by RenderProp("loading") { toolbar.title = it }
         private var category: String by RenderProp("loading") { toolbar.subtitle = it }
-        private var categoryIcon: Int by RenderProp(R.drawable.logo_placeholder) { toolbar.logo = getDrawable(it) }*/
+        private var categoryIcon: Int by RenderProp(R.drawable.logo_placeholder) { toolbar.logo = getDrawable(it) }*//*
 
         private var isBigText : Boolean by RenderProp(false) {
             if (it) {
@@ -185,10 +186,10 @@ class ArticleFragment : BaseFragment<ArticleViewModel>(), IArticleView {
             switch_mode.isChecked = it
             root.delegate.localNightMode = if (it) AppCompatDelegate.MODE_NIGHT_YES
             else AppCompatDelegate.MODE_NIGHT_NO
-        }
+        }*/
 
         var isSearch : Boolean by RenderProp(false) {
-            if (it) {
+            /*if (it) {
                 showSearchBar()
                 with(toolbar) {
                     (layoutParams as AppBarLayout.LayoutParams).scrollFlags = AppBarLayout.LayoutParams.SCROLL_FLAG_NO_SCROLL
@@ -200,7 +201,7 @@ class ArticleFragment : BaseFragment<ArticleViewModel>(), IArticleView {
                     (layoutParams as AppBarLayout.LayoutParams).scrollFlags = AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL or
                             AppBarLayout.LayoutParams.SCROLL_FLAG_ENTER_ALWAYS_COLLAPSED
                 }
-            }
+            }*/
         }
 
         private var searchResults: List<Pair<Int, Int>> by RenderProp(emptyList())
@@ -237,15 +238,12 @@ class ArticleFragment : BaseFragment<ArticleViewModel>(), IArticleView {
             data as ArticleState
 
 
-            isLike = data.isLike
+            /*isLike = data.isLike
             isBookmark = data.isBookmark
             isShowMenu = data.isShowMenu
             isBigText = data.isBigText
-            isDarkMode = data.isDarkMode
+            isDarkMode = data.isDarkMode*/
 
-            if (data.title != null) title = data.title
-            if (data.category != null) category = data.category
-            if (data.categoryIcon != null) categoryIcon = data.categoryIcon as Int
             content = data.content
 
             isLoadingContent = data.isLoadingContent

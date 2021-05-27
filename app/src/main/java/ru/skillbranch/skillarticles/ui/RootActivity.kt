@@ -4,21 +4,15 @@ import androidx.activity.viewModels
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_root.*
 import ru.skillbranch.skillarticles.R
-import ru.skillbranch.skillarticles.ui.article.IArticleView
 import ru.skillbranch.skillarticles.ui.base.BaseActivity
-import ru.skillbranch.skillarticles.viewmodels.article.ArticleViewModel
+import ru.skillbranch.skillarticles.viewmodels.RootViewModel
+import ru.skillbranch.skillarticles.viewmodels.base.IViewModelState
 import ru.skillbranch.skillarticles.viewmodels.base.Notify
-import ru.skillbranch.skillarticles.viewmodels.base.ViewModelFactory
 
-class RootActivity : BaseActivity<RootViewModel>(), IArticleView {
+class RootActivity : BaseActivity<RootViewModel>() {
 
     override val layout: Int = R.layout.activity_root
-    override val viewModel: ArticleViewModel by viewModels {
-        ViewModelFactory(
-            owner = this,
-            params = "0"
-        )
-    }
+    override val viewModel: RootViewModel by viewModels()
 
 
 
@@ -52,6 +46,10 @@ class RootActivity : BaseActivity<RootViewModel>(), IArticleView {
             }
         }
         snackbar.show()
+    }
+
+    override fun subscribeOnState(state: IViewModelState) {
+        //Do smth with state
     }
 
 

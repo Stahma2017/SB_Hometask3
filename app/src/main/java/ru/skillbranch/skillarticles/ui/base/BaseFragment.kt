@@ -32,10 +32,9 @@ abstract class BaseFragment<T : BaseViewModel<out IViewModelState>> : Fragment()
         viewModel.restoreState()
         binding?.restoreUi(savedInstanceState)
 
-        viewModel.observeState(viewLifecycleOwner) {
-            binding?.bind(it)
-        }
-
+        viewModel.observeState(viewLifecycleOwner) { binding?.bind(it) }
+        //bind default values if viewmodel not loaded data
+        if (binding?.isInflated == false) binding?.onFinishInflate()
         viewModel.observeNotifications(viewLifecycleOwner) { root.renderNotification(it) }
 
         setupViews()
@@ -44,5 +43,12 @@ abstract class BaseFragment<T : BaseViewModel<out IViewModelState>> : Fragment()
     override fun onViewStateRestored(savedInstanceState: Bundle?) {
         super.onViewStateRestored(savedInstanceState)
         binding?.rebind()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        viewModel.saveState()
+        binding?.saveUi(outState)
+        super.onSaveInstanceState(outState)
+
     }
 }
