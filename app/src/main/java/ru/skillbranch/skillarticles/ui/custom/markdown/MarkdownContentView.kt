@@ -63,12 +63,11 @@ class MarkdownContentView @JvmOverloads constructor(
     public override fun onRestoreInstanceState(state: Parcelable) {
         super.onRestoreInstanceState(state)
         if (state is SavedState) layoutManager = state.layout
-
         // TODO temp solution, move this into fragment
-        children.filter { it !is MarkdownTextView }
+        /*children.filter { it !is MarkdownTextView }
             .forEachIndexed{ index, view ->
                 layoutManager.attachToParent(view, index)
-            }
+            }*/
     }
 
     override fun dispatchSaveInstanceState(container: SparseArray<Parcelable>?) {
@@ -107,6 +106,7 @@ class MarkdownContentView @JvmOverloads constructor(
 
     fun setContent(content: List<MarkdownElement>) {
         elements = content
+        var index = 0
         content.forEach {
             when(it) {
                 is MarkdownElement.Text -> {
@@ -125,11 +125,15 @@ class MarkdownContentView @JvmOverloads constructor(
                 is MarkdownElement.Image -> {
                     val iv = MarkdownImageView(context, textSize, it.image.url, it.image.text, it.image.alt)
                     addView(iv)
+                    layoutManager.attachToParent(iv, index)
+                    index++
                 }
 
                 is MarkdownElement.Scroll -> {
                     val sv = MarkdownCodeView(context, textSize, it.blockCode.text)
                     addView(sv)
+                    layoutManager.attachToParent(sv, index)
+                    index++
                 }
             }
         }

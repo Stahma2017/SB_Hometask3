@@ -5,23 +5,18 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.os.Bundle
 import android.view.Menu
-import android.view.MenuItem
-import android.widget.ImageView
 import androidx.annotation.VisibleForTesting
-import androidx.appcompat.app.AppCompatDelegate
-import androidx.appcompat.widget.SearchView
-import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.viewModels
-import com.google.android.material.appbar.AppBarLayout
-import kotlinx.android.synthetic.main.activity_root.*
+import androidx.navigation.fragment.navArgs
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.CenterCrop
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.bumptech.glide.request.RequestOptions.circleCropTransform
 import kotlinx.android.synthetic.main.fragment_article.*
-import kotlinx.android.synthetic.main.layout_bottombar.*
-import kotlinx.android.synthetic.main.layout_submenu.*
 import kotlinx.android.synthetic.main.search_view_layout.*
 import ru.skillbranch.skillarticles.R
 import ru.skillbranch.skillarticles.extensions.dpToIntPx
-import ru.skillbranch.skillarticles.extensions.hideKeyboard
-import ru.skillbranch.skillarticles.ui.RootActivity
+import ru.skillbranch.skillarticles.extensions.format
 import ru.skillbranch.skillarticles.ui.base.BaseFragment
 import ru.skillbranch.skillarticles.ui.base.Binding
 import ru.skillbranch.skillarticles.ui.custom.markdown.MarkdownElement
@@ -33,11 +28,11 @@ import ru.skillbranch.skillarticles.viewmodels.base.ViewModelFactory
 
 
 class ArticleFragment : BaseFragment<ArticleViewModel>(), IArticleView {
-
+    private val args : ArticleFragmentArgs by navArgs()
     override val viewModel: ArticleViewModel by viewModels {
         ViewModelFactory(
             owner = this,
-            params = "0"
+            params = args.articleId
         )
     }
 
@@ -57,6 +52,25 @@ class ArticleFragment : BaseFragment<ArticleViewModel>(), IArticleView {
     override fun setupViews() {
         setupBottombar()
         setupSubmenu()
+
+        //init views
+        val avatarSize = root.dpToIntPx(40)
+        val cornerRadius = root.dpToIntPx(8)
+
+        Glide.with(root)
+            .load(args.authorAvatar)
+            .apply(circleCropTransform())
+            .override(avatarSize)
+            .into(iv_author_avatar)
+
+        Glide.with(root)
+            .load(args.poster)
+            .transform(CenterCrop(), RoundedCorners(cornerRadius))
+            .into(iv_poster)
+
+        tv_title.text = args.title
+        tv_author.text = args.author
+        tv_date.text = args.date.format()
     }
 
     /*

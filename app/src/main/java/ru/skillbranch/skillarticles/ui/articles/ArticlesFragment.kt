@@ -2,6 +2,7 @@ package ru.skillbranch.skillarticles.ui.articles
 
 import android.util.Log
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -24,6 +25,18 @@ class ArticlesFragment : BaseFragment<ArticlesViewModel>() {
 
     private val articlesAdapter = ArticlesAdapter { item ->
         Log.e("ArticlesFragment", "click on article: ${item.id} ")
+        val action = ArticlesFragmentDirections.actionNavArticlesToPageArticle(
+            item.id,
+            item.author,
+            item.authorAvatar,
+            item.category,
+            item.categoryIcon,
+            item.date,
+            item.poster,
+            item.title
+        )
+
+        findNavController().navigate(action)
     }
 
     override fun setupViews() {
