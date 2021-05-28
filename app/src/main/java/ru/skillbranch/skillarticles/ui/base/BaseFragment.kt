@@ -53,6 +53,7 @@ abstract class BaseFragment<T : BaseViewModel<out IViewModelState>> : Fragment()
         //bind default values if viewmodel not loaded data
         if (binding?.isInflated == false) binding?.onFinishInflate()
         viewModel.observeNotifications(viewLifecycleOwner) { root.renderNotification(it) }
+        viewModel.observeNavigation(viewLifecycleOwner) { root.viewModel.navigate(it) }
 
         setupViews()
     }

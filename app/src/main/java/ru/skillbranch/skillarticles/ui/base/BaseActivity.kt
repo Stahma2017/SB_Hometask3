@@ -8,6 +8,8 @@ import android.widget.ImageView
 import android.widget.Toolbar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources.getDrawable
+import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.os.bundleOf
 import androidx.core.view.children
 import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentActivity
@@ -15,11 +17,13 @@ import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions.circleCropTransform
+import com.google.android.material.behavior.HideBottomViewOnScrollBehavior
 import kotlinx.android.synthetic.main.activity_root.*
 import ru.skillbranch.skillarticles.R
 import ru.skillbranch.skillarticles.extensions.dpToIntPx
 import ru.skillbranch.skillarticles.viewmodels.base.BaseViewModel
 import ru.skillbranch.skillarticles.viewmodels.base.IViewModelState
+import ru.skillbranch.skillarticles.viewmodels.base.NavigationCommand
 import ru.skillbranch.skillarticles.viewmodels.base.Notify
 
 abstract class BaseActivity<T : BaseViewModel<out IViewModelState>> : AppCompatActivity() {
@@ -42,6 +46,7 @@ abstract class BaseActivity<T : BaseViewModel<out IViewModelState>> : AppCompatA
         setSupportActionBar(toolbar)
         viewModel.observeState(this) { subscribeOnState(it) }
         viewModel.observeNotifications(this) { renderNotification(it) }
+        viewModel.observeNavigation(this) { subscribeOnNavigation(it) }
         navController = findNavController(R.id.nav_host_fragment)
     }
 
@@ -57,6 +62,29 @@ abstract class BaseActivity<T : BaseViewModel<out IViewModelState>> : AppCompatA
 
     override fun onSupportNavigateUp(): Boolean {
         return navController.navigateUp() || super.onSupportNavigateUp()
+    }
+
+    private fun subscribeOnNavigation(command: NavigationCommand) {
+        when (command) {
+            is NavigationCommand.To -> {
+                navController.navigate(
+                    command.destination,
+                    command.args,
+                    command.options,
+                    command.extras
+                )
+            }
+
+            is NavigationCommand.FinishLogin -> {
+                navController.navigate(R.id.finish_login)
+                if (command.privateDestination != null) navController.navigate(command.privateDestination)
+            }
+
+            is NavigationCommand.StartLogin -> {
+                navController.navigate(R.id.start_login,
+                bundleOf("private_destination" to (command.privateDestination ?: -1)))
+            }
+        }
     }
 }
 
@@ -108,6 +136,9 @@ class ToolbarBuilder() {
     }
 
     fun build(context: FragmentActivity) {
+        //show appbar if hidden due to scroll behavior
+        context.appbar.setExpanded(true, true)
+
         with(context.toolbar) {
             if (this@ToolbarBuilder.title != null) title = this@ToolbarBuilder.title
             subtitle = this@ToolbarBuilder.subtitle
@@ -197,6 +228,9 @@ class BottombarBuilder() {
 
         with(context.nav_view) {
             isVisible = visible
+            //show bottombar if hidden due to scroll behavior
+            ((layoutParams as CoordinatorLayout.LayoutParams).behavior as HideBottomViewOnScrollBehavior)
+                .slideUp(this)
         }
     }
 
