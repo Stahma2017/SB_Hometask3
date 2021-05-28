@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.view.WindowManager
 import androidx.annotation.VisibleForTesting
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.content.res.AppCompatResources.getDrawable
@@ -86,6 +87,11 @@ class ArticleFragment : BaseFragment<ArticleViewModel>(), IArticleView {
 
     override val layout: Int = R.layout.fragment_article
 
+    override fun onDestroyView() {
+        root.window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING)
+        super.onDestroyView()
+    }
+
     override fun showSearchBar() {
         bottombar.setSearchState(true)
         scroll.setMarginOptionally(bottom = root.dpToIntPx(56))
@@ -97,6 +103,8 @@ class ArticleFragment : BaseFragment<ArticleViewModel>(), IArticleView {
     }
 
     override fun setupViews() {
+        //window resize options
+        root.window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
         setupBottombar()
         setupSubmenu()
 
@@ -121,9 +129,7 @@ class ArticleFragment : BaseFragment<ArticleViewModel>(), IArticleView {
 
         et_comment.setOnEditorActionListener { view, _, _ ->
             root.hideKeyboard(view)
-       //     viewModel.handleSendComment()
-            val action = AuthFragmentDirections.startLogin()
-            findNavController().navigate(action)
+            viewModel.handleSendComment()
             true
         }
     }

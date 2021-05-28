@@ -43,7 +43,8 @@ class RootActivity : BaseActivity<RootViewModel>() {
 
         navController.addOnDestinationChangedListener { controller, destination, arguments ->
            // if destination change set select bottom bar navigation item
-            nav_view.selectDestination(destination)
+            //TODO task
+           // nav_view.selectDestination(destination)
         }
     }
 

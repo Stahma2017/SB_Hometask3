@@ -1,10 +1,7 @@
 package ru.skillbranch.skillarticles.viewmodels.article
 
-import android.os.Bundle
-import androidx.core.os.bundleOf
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.ViewModel
 import ru.skillbranch.skillarticles.data.ArticleData
 import ru.skillbranch.skillarticles.data.ArticlePersonalInfo
 import ru.skillbranch.skillarticles.data.repositories.ArticleRepository
@@ -16,6 +13,7 @@ import ru.skillbranch.skillarticles.ui.custom.markdown.MarkdownElement
 import ru.skillbranch.skillarticles.ui.custom.markdown.clearContent
 import ru.skillbranch.skillarticles.viewmodels.base.BaseViewModel
 import ru.skillbranch.skillarticles.viewmodels.base.IViewModelState
+import ru.skillbranch.skillarticles.viewmodels.base.NavigationCommand
 import ru.skillbranch.skillarticles.viewmodels.base.Notify
 
 class ArticleViewModel(
@@ -60,6 +58,10 @@ class ArticleViewModel(
                 isDarkMode = settings.isDarkMode,
                 isBigText = settings.isBigText
             )
+        }
+
+        subscribeOnDataSource(repository.isAuth()) { auth, state ->
+            state.copy(isAuth = auth)
         }
     }
 
@@ -153,6 +155,11 @@ class ArticleViewModel(
 
     fun handleCopyCode() {
         notify(Notify.TextMessage("Code copy to clipboard"))
+    }
+
+    fun handleSendComment() {
+        if (!currentState.isAuth) navigate(NavigationCommand.StartLogin())
+        //TODO send comment
     }
 }
 
