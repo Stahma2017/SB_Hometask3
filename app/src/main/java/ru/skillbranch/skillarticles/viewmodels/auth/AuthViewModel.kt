@@ -15,7 +15,7 @@ class AuthViewModel(handle: SavedStateHandle) : BaseViewModel<AuthState>(handle,
         }
     }
 
-    fun hadleLogin(login: String, pass: String, dest: Int?) {
+    fun handleLogin(login: String, pass: String, dest: Int?) {
         repository.setAuth(true)
         navigate(NavigationCommand.FinishLogin(dest))
     }

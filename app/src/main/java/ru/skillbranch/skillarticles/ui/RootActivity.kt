@@ -2,14 +2,17 @@ package ru.skillbranch.skillarticles.ui
 
 import android.os.Bundle
 import androidx.activity.viewModels
+import androidx.navigation.NavDestination
 import androidx.navigation.Navigation
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_root.*
 import kotlinx.android.synthetic.main.layout_bottombar.*
 import ru.skillbranch.skillarticles.R
+import ru.skillbranch.skillarticles.extensions.selectDestination
 import ru.skillbranch.skillarticles.ui.base.BaseActivity
 import ru.skillbranch.skillarticles.viewmodels.RootViewModel
 import ru.skillbranch.skillarticles.viewmodels.base.IViewModelState
@@ -32,8 +35,9 @@ class RootActivity : BaseActivity<RootViewModel>() {
                 R.id.nav_profile
             )
         )
-        setupActionBarWithNavController(navController, appbarConfiguration)
-   //     nav_view.setupWithNavController(navController)
+
+       setupActionBarWithNavController(navController, appbarConfiguration)
+       nav_view.setupWithNavController(navController)
 
         nav_view.setOnNavigationItemSelectedListener {
             // if click on bottom navigation item -> navigate to destination by item id
@@ -44,7 +48,8 @@ class RootActivity : BaseActivity<RootViewModel>() {
         navController.addOnDestinationChangedListener { controller, destination, arguments ->
            // if destination change set select bottom bar navigation item
             //TODO task
-           // nav_view.selectDestination(destination)
+            nav_view.selectDestination(destination)
+
         }
     }
 
@@ -87,3 +92,4 @@ class RootActivity : BaseActivity<RootViewModel>() {
 
 
 }
+

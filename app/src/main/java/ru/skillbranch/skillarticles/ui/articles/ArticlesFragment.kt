@@ -32,9 +32,9 @@ class ArticlesFragment : BaseFragment<ArticlesViewModel>() {
             item.authorAvatar,
             item.category,
             item.categoryIcon,
-            item.date,
             item.poster,
-            item.title
+            item.title,
+            item.date
         )
 
         viewModel.navigate(NavigationCommand.To(action.actionId, action.arguments))
@@ -55,6 +55,7 @@ class ArticlesFragment : BaseFragment<ArticlesViewModel>() {
 
         override fun bind(data: IViewModelState) {
             data as ArticlesState
+            Log.d("TEST22", "articles = $articles")
             articles = data.articles
         }
     }

@@ -49,6 +49,7 @@ class ArticleFragment : BaseFragment<ArticleViewModel>(), IArticleView {
             params = args.articleId
         )
     }
+    override val layout: Int = R.layout.fragment_article
 
     @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
     override val binding: ArticleBinding by lazy { ArticleBinding() }
@@ -65,27 +66,14 @@ class ArticleFragment : BaseFragment<ArticleViewModel>(), IArticleView {
                 R.layout.search_view_layout
             )
         )
-
-        addMenuItem(MenuItemHolder(
-            "something",
-            R.id.action_search + 1,
-            R.drawable.ic_account_circle_black_24dp,
-            clickListener = { menuItem ->
-                Log.e(
-                    "ArticleFragment",
-                    "click menu item: $menuItem"
-                )
-            }
-        ))
     }
 
     override val prepareBottombar: (BottombarBuilder.() -> Unit)? = {
         this.addView(R.layout.layout_submenu)
-        addView(R.layout.layout_bottombar)
+            .addView(R.layout.layout_bottombar)
         setVisibility(false)
     }
 
-    override val layout: Int = R.layout.fragment_article
 
     override fun onDestroyView() {
         root.window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING)
@@ -144,18 +132,6 @@ class ArticleFragment : BaseFragment<ArticleViewModel>(), IArticleView {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
     }
-
-    /*
-
-    override fun showSearchBar() {
-        bottombar.setSearchState(true)
-        scroll.setMarginOptionally(bottom = dpToIntPx(56))
-    }
-
-    override fun hideSearchBar() {
-        bottombar.setSearchState(false)
-        scroll.setMarginOptionally(bottom = dpToIntPx(0))
-    }*/
 
     override fun onPrepareOptionsMenu(menu: Menu) {
         super.onPrepareOptionsMenu(menu)
@@ -244,18 +220,20 @@ class ArticleFragment : BaseFragment<ArticleViewModel>(), IArticleView {
         private var isLoadingContent by RenderProp(true)
 
 
-        private var isLike : Boolean by RenderProp(false) { bottombar.btn_like.isChecked = it}
-        private var isBookmark : Boolean by RenderProp(false) { bottombar.btn_bookmark.isChecked = it}
-        private var isShowMenu : Boolean by RenderProp(false) {
+        private var isLike: Boolean by RenderProp(false) { bottombar.btn_like.isChecked = it }
+        private var isBookmark: Boolean by RenderProp(false) {
+            bottombar.btn_bookmark.isChecked = it
+        }
+        private var isShowMenu: Boolean by RenderProp(false) {
             bottombar.btn_settings.isChecked = it
             if (it) submenu.open() else submenu.close()
         }
 
-       /* private var title: String by RenderProp("loading") { toolbar.title = it }
-        private var category: String by RenderProp("loading") { toolbar.subtitle = it }
-        private var categoryIcon: Int by RenderProp(R.drawable.logo_placeholder) { toolbar.logo = getDrawable(it) }*/
+        /* private var title: String by RenderProp("loading") { toolbar.title = it }
+         private var category: String by RenderProp("loading") { toolbar.subtitle = it }
+         private var categoryIcon: Int by RenderProp(R.drawable.logo_placeholder) { toolbar.logo = getDrawable(it) }*/
 
-        private var isBigText : Boolean by RenderProp(false) {
+        private var isBigText: Boolean by RenderProp(false) {
             if (it) {
                 tv_text_content.textSize = 18f
                 submenu.btn_text_up.isChecked = true
@@ -267,7 +245,7 @@ class ArticleFragment : BaseFragment<ArticleViewModel>(), IArticleView {
             }
         }
 
-        private var isDarkMode : Boolean by RenderProp(false, false) {
+        private var isDarkMode: Boolean by RenderProp(false, false) {
             submenu.switch_mode.isChecked = it
             root.delegate.localNightMode = if (it) AppCompatDelegate.MODE_NIGHT_YES
             else AppCompatDelegate.MODE_NIGHT_NO
@@ -277,14 +255,15 @@ class ArticleFragment : BaseFragment<ArticleViewModel>(), IArticleView {
             if (it) {
                 showSearchBar()
                 with(toolbar) {
-                    (layoutParams as AppBarLayout.LayoutParams).scrollFlags = AppBarLayout.LayoutParams.SCROLL_FLAG_NO_SCROLL
+                    (layoutParams as AppBarLayout.LayoutParams).scrollFlags =
+                        AppBarLayout.LayoutParams.SCROLL_FLAG_NO_SCROLL
                 }
-            }
-            else {
+            } else {
                 hideSearchBar()
                 with(toolbar) {
-                    (layoutParams as AppBarLayout.LayoutParams).scrollFlags = AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL or
-                            AppBarLayout.LayoutParams.SCROLL_FLAG_ENTER_ALWAYS_COLLAPSED
+                    (layoutParams as AppBarLayout.LayoutParams).scrollFlags =
+                        AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL or
+                                AppBarLayout.LayoutParams.SCROLL_FLAG_ENTER_ALWAYS_COLLAPSED
                 }
             }
         }
@@ -315,7 +294,7 @@ class ArticleFragment : BaseFragment<ArticleViewModel>(), IArticleView {
                     tv_text_content.clearSearchResult()
                 }
 
-                  bottombar.bindSearchInfo(sr.size, sp)
+                bottombar.bindSearchInfo(sr.size, sp)
             }
         }
 
