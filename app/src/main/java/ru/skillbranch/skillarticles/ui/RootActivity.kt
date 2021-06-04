@@ -1,6 +1,7 @@
 package ru.skillbranch.skillarticles.ui
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.viewModels
 import androidx.navigation.NavDestination
 import androidx.navigation.Navigation
@@ -46,13 +47,10 @@ class RootActivity : BaseActivity<RootViewModel>() {
         }
 
         navController.addOnDestinationChangedListener { controller, destination, arguments ->
-           // if destination change set select bottom bar navigation item
-            //TODO task
+            // if destination changes set selected bottom navigation item
             nav_view.selectDestination(destination)
-
         }
     }
-
 
     override fun renderNotification(notify: Notify) {
         val snackbar = Snackbar.make(container, notify.message, Snackbar.LENGTH_LONG)

@@ -76,20 +76,20 @@ abstract class BaseActivity<T : BaseViewModel<out IViewModelState>> : AppCompatA
                 )
             }
 
+            is NavigationCommand.StartLogin -> {
+                navController.navigate(R.id.start_login,
+                    bundleOf("private_destination" to (command.privateDestination ?: -1)))
+            }
+
             is NavigationCommand.FinishLogin -> {
                 navController.navigate(R.id.finish_login)
                 if (command.privateDestination != null) navController.navigate(command.privateDestination)
-            }
-
-            is NavigationCommand.StartLogin -> {
-                navController.navigate(R.id.start_login,
-                bundleOf("private_destination" to (command.privateDestination ?: -1)))
             }
         }
     }
 }
 
-class ToolbarBuilder() {
+class ToolbarBuilder {
     var title: String? = null
     var subtitle: String? = null
     var logo: String? = null
@@ -179,7 +179,7 @@ data class MenuItemHolder(
     val clickListener: ((MenuItem) -> Unit)? = null
 )
 
-class BottombarBuilder() {
+class BottombarBuilder {
     private var visible: Boolean = true
     private val views = mutableListOf<Int>()
     private val tempViews = mutableListOf<Int>()

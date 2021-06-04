@@ -5,7 +5,6 @@ import android.view.ViewGroup
 import androidx.core.view.*
 import androidx.navigation.NavDestination
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import kotlinx.android.synthetic.main.activity_root.*
 
 fun View.setMarginOptionally(
     left: Int = marginLeft,
@@ -29,7 +28,8 @@ fun View.setPaddingOptionally(
 }
 
 fun BottomNavigationView.selectDestination(destination: NavDestination) {
-
-    if (menu.findItem(destination.id) != null && selectedItemId != destination.id) { }
-    //selectedItemId = destination.id
+    val item = menu.findItem(destination.id)
+    if (item != null && selectedItemId != destination.id) {
+        selectedItemId = item.itemId
+    }
 }

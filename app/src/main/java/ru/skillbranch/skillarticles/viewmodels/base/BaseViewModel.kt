@@ -80,7 +80,6 @@ abstract class BaseViewModel<T: IViewModelState>(
             }
         }
 
-
         fun peekContent(): E = content
     }
 
