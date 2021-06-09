@@ -7,9 +7,7 @@ import androidx.lifecycle.*
 import androidx.navigation.NavOptions
 import androidx.navigation.Navigator
 
-abstract class BaseViewModel<T: IViewModelState>(
-    private val handleState: SavedStateHandle,
-    initialState: T) : ViewModel() {
+abstract class BaseViewModel<T: IViewModelState>(private val handleState: SavedStateHandle, initialState: T) : ViewModel() {
 
     @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
     val notifications = MutableLiveData<Event<Notify>>()

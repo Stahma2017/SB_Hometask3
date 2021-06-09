@@ -19,4 +19,5 @@ interface IArticleViewModel {
     fun getArticleContent(): LiveData<List<MarkdownElement>?>
     fun getArticleData(): LiveData<ArticleData?>
     fun getArticlePersonalInfo(): LiveData<ArticlePersonalInfo?>
+    fun handleSendComment(comment: String)
 }
