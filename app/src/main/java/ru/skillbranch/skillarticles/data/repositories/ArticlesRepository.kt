@@ -1,25 +1,29 @@
 package ru.skillbranch.skillarticles.data.repositories
 
 import android.util.Log
-import androidx.lifecycle.LiveData
 import androidx.paging.DataSource
 import androidx.paging.PositionalDataSource
-import ru.skillbranch.skillarticles.data.ArticleItemData
 import ru.skillbranch.skillarticles.data.LocalDataHolder
 import ru.skillbranch.skillarticles.data.NetworkDataHolder
+import ru.skillbranch.skillarticles.data.models.ArticleItemData
 import java.lang.Thread.sleep
+import java.util.*
 
 object ArticlesRepository {
-    fun loadArticles() : LiveData<List<ArticleItemData>?> = LocalDataHolder.findArticles()
 
     private val local = LocalDataHolder
     private val network = NetworkDataHolder
 
-    fun allArticles(): ArticlesDataFactory =
-        ArticlesDataFactory(ArticleStrategy.AllArticles(::findArticlesByRange))
+    fun allArticles(): ArticlesDataFactory = ArticlesDataFactory(ArticleStrategy.AllArticles(::findArticlesByRange))
+    fun searchArticles(searchQuery: String) = ArticlesDataFactory(ArticleStrategy.SearchArticle(::searchArticlesByTitle, searchQuery))
+    fun updateBookmark(id: String, isChecked: Boolean) {
+        //TODO nasty implementation, refactor later
 
-    fun searchArticles(searchQuery: String) =
-        ArticlesDataFactory(ArticleStrategy.SearchArticle(::searchArticlesByTitle, searchQuery))
+        val position = local.localArticleItems.indexOfFirst { it.id == id }
+        val oldItem = local.localArticleItems[position]
+                local.localArticleItems.removeAt(position)
+        local.localArticleItems.add(position, oldItem.copy(isBookmark = !isChecked))
+    }
 
     private fun findArticlesByRange(start: Int, size: Int) = local.localArticleItems
         .drop(start)
@@ -41,17 +45,25 @@ object ArticlesRepository {
         local.localArticleItems.addAll(articles)
             .apply { sleep(500) }
     }
+
+    fun bookmarkArticle(start: Int, size: Int, id: String, isChecked: Boolean) = local.localArticleItems
+        .map { if (it.id == id) it.copy(isBookmark = isChecked) else it }
+        .drop(start)
+        .take(size)
+        .toList()
+
+
+
+
 }
 
 class ArticlesDataFactory(val strategy: ArticleStrategy) : DataSource.Factory<Int, ArticleItemData>() {
     override fun create(): DataSource<Int, ArticleItemData> = ArticleDataSource(strategy)
 }
 
-class ArticleDataSource(private val strategy: ArticleStrategy) : PositionalDataSource<ArticleItemData>() {
-    override fun loadInitial(
-        params: LoadInitialParams,
-        callback: LoadInitialCallback<ArticleItemData>
-    ) {
+class ArticleDataSource(val strategy: ArticleStrategy) : PositionalDataSource<ArticleItemData>() {
+
+    override fun loadInitial(params: LoadInitialParams, callback: LoadInitialCallback<ArticleItemData>) {
         val result = strategy.getItems(params.requestedStartPosition, params.requestedLoadSize)
         Log.e("ArticlesRepository", "loadInitial: start > ${params.requestedStartPosition}  size > ${params.requestedLoadSize} resultSize > ${result.size}")
         callback.onResult(result, params.requestedStartPosition)
@@ -83,5 +95,14 @@ sealed class ArticleStrategy {
     }
 
     //TODO bookmarks Strategy
+
+    class BookmarkArticle(
+        private val itemProvider: (Int, Int, String, Boolean)  -> List<ArticleItemData>,
+        private val id: String,
+        private val isChecked: Boolean
+    ): ArticleStrategy() {
+        override fun getItems(start: Int, size: Int): List<ArticleItemData> =
+            itemProvider(start, size, id, isChecked)
+    }
 }
 

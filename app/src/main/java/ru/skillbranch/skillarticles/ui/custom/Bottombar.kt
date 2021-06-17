@@ -105,8 +105,6 @@ class Bottombar @JvmOverloads constructor(
         ObjectAnimator.ofFloat(this, "translationY", height.toFloat()).start()
     }
 
-
-
     private class SavedState : BaseSavedState, Parcelable {
         var ssIsSearchMode: Boolean = false
 

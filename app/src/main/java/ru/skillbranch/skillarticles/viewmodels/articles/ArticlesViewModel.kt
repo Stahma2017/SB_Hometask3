@@ -7,7 +7,7 @@ import androidx.paging.PagedList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import ru.skillbranch.skillarticles.data.ArticleItemData
+import ru.skillbranch.skillarticles.data.models.ArticleItemData
 import ru.skillbranch.skillarticles.data.repositories.ArticleStrategy
 import ru.skillbranch.skillarticles.data.repositories.ArticlesDataFactory
 import ru.skillbranch.skillarticles.data.repositories.ArticlesRepository
@@ -29,37 +29,25 @@ class ArticlesViewModel(handle: SavedStateHandle) : BaseViewModel<ArticlesState>
     }
 
     private val listData = Transformations.switchMap(state) {
+        Log.d("TEST45", "listData changed")
         when {
-            it.isSearch && !it.searchQuery.isNullOrBlank() -> buildPagedList(
-                repository.searchArticles(it.searchQuery)
-            )
+            it.isSearch && !it.searchQuery.isNullOrBlank() -> buildPagedList(repository.searchArticles(it.searchQuery))
             else -> buildPagedList(repository.allArticles())
         }
     }
 
     fun observeList(
         owner: LifecycleOwner,
-        onChange: (list: PagedList<ArticleItemData>) -> Unit
-    ) {
+        onChange: (list: PagedList<ArticleItemData>) -> Unit) {
         listData.observe(owner, Observer { onChange(it) })
     }
 
-    private fun buildPagedList(
-        dataFactory: ArticlesDataFactory
-    ) : LiveData<PagedList<ArticleItemData>> {
-        val builder = LivePagedListBuilder<Int, ArticleItemData>(
-            dataFactory,
-            listConfig
-        )
+    private fun buildPagedList(dataFactory: ArticlesDataFactory) : LiveData<PagedList<ArticleItemData>> {
+        val builder = LivePagedListBuilder<Int, ArticleItemData>(dataFactory, listConfig)
 
         //if all articles
         if (dataFactory.strategy is ArticleStrategy.AllArticles) {
-            builder.setBoundaryCallback(
-                ArticlesBoundaryCallback(
-                    ::zeroLoadingHandle,
-                    ::itemAtEndHandle
-                )
-            )
+            builder.setBoundaryCallback(ArticlesBoundaryCallback(::zeroLoadingHandle, ::itemAtEndHandle))
         }
 
         return builder
@@ -70,10 +58,7 @@ class ArticlesViewModel(handle: SavedStateHandle) : BaseViewModel<ArticlesState>
     private fun itemAtEndHandle(lastLoadArticle: ArticleItemData) {
         Log.e("ArticlesViewModel", "itemAtEndHandle: ")
         viewModelScope.launch(Dispatchers.IO) {
-            val items = repository.loadArticlesFromNetwork(
-                start = lastLoadArticle.id.toInt().inc(),
-                size = listConfig.pageSize
-            )
+            val items = repository.loadArticlesFromNetwork(start = lastLoadArticle.id.toInt().inc(), size = listConfig.pageSize)
             if (items.isNotEmpty()) {
                 repository.insertArticlesToDb(items)
                 //invalidate data in data source -> create new LiveData<PagedList>
@@ -94,10 +79,7 @@ class ArticlesViewModel(handle: SavedStateHandle) : BaseViewModel<ArticlesState>
         Log.e("ArticlesViewModel", "zeroLoadingHandle: ")
         notify(Notify.TextMessage("Storage is empty"))
         viewModelScope.launch(Dispatchers.IO) {
-            val items = repository.loadArticlesFromNetwork(
-                start = 0,
-                size = listConfig.initialLoadSizeHint
-            )
+            val items = repository.loadArticlesFromNetwork(start = 0, size = listConfig.initialLoadSizeHint)
             if (items.isNotEmpty()) {
                 repository.insertArticlesToDb(items)
                 //invalidate data in data source -> create new LiveData<PagedList>
@@ -115,12 +97,9 @@ class ArticlesViewModel(handle: SavedStateHandle) : BaseViewModel<ArticlesState>
         updateState { it.copy(isSearch = isSearch) }
     }
 
-
-    init {
-        subscribeOnDataSource(repository.loadArticles()) { articles, state ->
-            articles ?: return@subscribeOnDataSource null
-            state.copy(articles = articles)
-        }
+    fun handleToggleBookmark(id: String, isChecked: Boolean) {
+        repository.updateBookmark(id, isChecked)
+        listData.value?.dataSource?.invalidate()
     }
 }
 

@@ -32,13 +32,15 @@ fun BottomNavigationView.selectDestination(destination: NavDestination) {
     val item = menu.findItem(destination.id)
     if (item != null && selectedItemId != destination.id) {
         selectedItemId = item.itemId
-    } else {
-       /* destination.parent?.id?.let {
-            val parentItem = menu.findItem(it)
-            if (parentItem != null && selectedItemId != parentItem.itemId) {
-                selectedItemId = parentItem.itemId
-            }
-        }*/
+    }
+}
 
+fun BottomNavigationView.selectItem(itemId: Int?){
+    itemId?: return
+    for (item in menu.iterator()) {
+        if(item.itemId == itemId) {
+            item.isChecked = true
+            break
+        }
     }
 }

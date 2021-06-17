@@ -10,13 +10,17 @@ import kotlinx.android.synthetic.main.activity_root.*
 import kotlinx.android.synthetic.main.layout_bottombar.*
 import ru.skillbranch.skillarticles.R
 import ru.skillbranch.skillarticles.extensions.selectDestination
+import ru.skillbranch.skillarticles.extensions.selectItem
 import ru.skillbranch.skillarticles.ui.base.BaseActivity
+import ru.skillbranch.skillarticles.ui.custom.Bottombar
+import ru.skillbranch.skillarticles.viewmodels.RootState
 import ru.skillbranch.skillarticles.viewmodels.RootViewModel
 import ru.skillbranch.skillarticles.viewmodels.base.IViewModelState
 import ru.skillbranch.skillarticles.viewmodels.base.NavigationCommand
 import ru.skillbranch.skillarticles.viewmodels.base.Notify
 
 class RootActivity : BaseActivity<RootViewModel>() {
+    var isAuth : Boolean = false
 
     override val layout: Int = R.layout.activity_root
     public override val viewModel: RootViewModel by viewModels()
@@ -34,7 +38,7 @@ class RootActivity : BaseActivity<RootViewModel>() {
         )
 
        setupActionBarWithNavController(navController, appbarConfiguration)
-       nav_view.setupWithNavController(navController)
+     //  nav_view.setupWithNavController(navController)
 
         nav_view.setOnNavigationItemSelectedListener {
             // if click on bottom navigation item -> navigate to destination by item id
@@ -43,18 +47,22 @@ class RootActivity : BaseActivity<RootViewModel>() {
         }
 
         navController.addOnDestinationChangedListener { controller, destination, arguments ->
-
-
             // if destination changes set selected bottom navigation item
             nav_view.selectDestination(destination)
+
+            if (destination.id == R.id.nav_auth) nav_view.selectItem(arguments?.get("private_destination") as Int?)
+
+            if (isAuth && destination.id == R.id.nav_auth) {
+                controller.popBackStack()
+                val private = arguments?.get("private_destination") as Int?
+                if (private != null) controller.navigate(private)
+            }
         }
     }
 
     override fun renderNotification(notify: Notify) {
         val snackbar = Snackbar.make(container, notify.message, Snackbar.LENGTH_LONG)
-
-        if (bottombar != null) snackbar.anchorView = bottombar
-        else snackbar.anchorView = nav_view
+        snackbar.anchorView =  findViewById<Bottombar>(R.id.bottombar) ?: nav_view
 
         when (notify) {
             is Notify.TextMessage -> { /*nothing*/
@@ -83,7 +91,8 @@ class RootActivity : BaseActivity<RootViewModel>() {
     }
 
     override fun subscribeOnState(state: IViewModelState) {
-        //Do smth with state
+        state as RootState
+        isAuth = state.isAuth
     }
 
 

@@ -4,21 +4,17 @@ import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.SearchView
+import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.fragment_articles.*
 import ru.skillbranch.skillarticles.R
-import ru.skillbranch.skillarticles.data.ArticleItemData
 import ru.skillbranch.skillarticles.ui.base.BaseFragment
 import ru.skillbranch.skillarticles.ui.base.Binding
 import ru.skillbranch.skillarticles.ui.base.MenuItemHolder
 import ru.skillbranch.skillarticles.ui.base.ToolbarBuilder
 import ru.skillbranch.skillarticles.ui.delegates.RenderProp
-import ru.skillbranch.skillarticles.viewmodels.article.ArticleState
 import ru.skillbranch.skillarticles.viewmodels.articles.ArticlesState
 import ru.skillbranch.skillarticles.viewmodels.articles.ArticlesViewModel
 import ru.skillbranch.skillarticles.viewmodels.base.IViewModelState
@@ -41,7 +37,7 @@ class ArticlesFragment : BaseFragment<ArticlesViewModel>() {
         )
     }
 
-    private val articlesAdapter = ArticlesAdapter { item ->
+    private val articlesAdapter = ArticlesAdapter( { item ->
         Log.e("ArticlesFragment", "click on article: ${item.id} ")
         val action = ArticlesFragmentDirections.actionNavArticlesToPageArticle(
             item.id,
@@ -55,7 +51,9 @@ class ArticlesFragment : BaseFragment<ArticlesViewModel>() {
         )
 
         viewModel.navigate(NavigationCommand.To(action.actionId, action.arguments))
-    }
+    }, { id, isBookmarked ->
+        viewModel.handleToggleBookmark(id, isBookmarked)
+    })
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -92,7 +90,7 @@ class ArticlesFragment : BaseFragment<ArticlesViewModel>() {
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
-                viewModel.handleSearch(query)
+                viewModel.handleSearch(newText)
                 return true
             }
         })
@@ -109,6 +107,7 @@ class ArticlesFragment : BaseFragment<ArticlesViewModel>() {
             adapter = articlesAdapter
             addItemDecoration(DividerItemDecoration(context, LinearLayoutManager.VERTICAL))
         }
+
         viewModel.observeList(viewLifecycleOwner) {
             articlesAdapter.submitList(it)
         }
@@ -123,9 +122,6 @@ class ArticlesFragment : BaseFragment<ArticlesViewModel>() {
             //TODO show shimmer on rv_list
         }
 
-        private var articles : List<ArticleItemData> by RenderProp(emptyList()) {
-            articlesAdapter.submitList(it)
-        }
 
         override fun bind(data: IViewModelState) {
             data as ArticlesState

@@ -7,9 +7,11 @@ import androidx.lifecycle.Transformations
 import androidx.paging.DataSource
 import androidx.paging.ItemKeyedDataSource
 import ru.skillbranch.skillarticles.data.*
+import ru.skillbranch.skillarticles.data.models.*
 import ru.skillbranch.skillarticles.ui.custom.markdown.MarkdownElement
 import ru.skillbranch.skillarticles.ui.custom.markdown.MarkdownParser
 import java.lang.Thread.sleep
+import kotlin.math.abs
 
 object ArticleRepository {
     private val local = LocalDataHolder
@@ -41,11 +43,10 @@ object ArticleRepository {
 
     fun isAuth(): MutableLiveData<Boolean> = local.isAuth()
 
-    private fun loadCommentsByRange(
-        slug: String?,
-        size: Int,
-        articleId: String
-    ) : List<CommentItemData> {
+    fun allComments(articleId: String, totalCount: Int) = CommentsDataFactory(itemProvider = ::loadCommentsByRange, articleId = articleId, totalCount = totalCount)
+
+    private fun loadCommentsByRange(slug: String?, size: Int, articleId: String
+    ): List<CommentItemData> {
         val data = network.commentsData.getOrElse(articleId) { mutableListOf() }
 
         return when {
@@ -55,7 +56,7 @@ object ArticleRepository {
                 .take(size)
 
             size < 0 -> data
-                .dropLatWhile { it.slug != slug }
+                .dropLastWhile { it.slug != slug }
                 .dropLast(1)
                 .takeLast(abs(size))
 
@@ -77,20 +78,24 @@ class CommentsDataFactory(
     private val itemProvider: (String?, Int, String) -> List<CommentItemData>,
     private val articleId: String,
     private val totalCount: Int
-) : DataSource<String?, CommentItemData> =
-        CommentsDataSource(itemProvider, articleId, totalCount)
+) : DataSource.Factory<String, CommentItemData>() {
+    override fun create(): DataSource<String, CommentItemData> = CommentsDataSource(itemProvider, articleId, totalCount)
+}
 
 class CommentsDataSource(
-    private val itemProvide: (String?, Int, String) -> List<CommentItemData>,
+    private val itemProvider: (String?, Int, String) -> List<CommentItemData>,
     private val articleId: String,
     private val totalCount: Int
-)         : ItemKeyedDataSource<String, CommentItemData>() {
+) : ItemKeyedDataSource<String, CommentItemData>() {
     override fun loadInitial(
         params: LoadInitialParams<String>,
         callback: LoadInitialCallback<CommentItemData>
     ) {
         val result = itemProvider(params.requestedInitialKey, params.requestedLoadSize, articleId)
-        Log.e("ArticleRepository", "loadInitial: key > ${params.requestedInitialKey} size > ${result.size} totalCount > $totalCount")
+        Log.e(
+            "ArticleRepository",
+            "loadInitial: key > ${params.requestedInitialKey} size > ${result.size} totalCount > $totalCount"
+        )
         callback.onResult(
             if (totalCount > 0) result else emptyList(),
             0,

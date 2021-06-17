@@ -2,16 +2,17 @@ package ru.skillbranch.skillarticles.viewmodels.article
 
 import android.util.Log
 import androidx.annotation.VisibleForTesting
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.Transformations
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
+import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import ru.skillbranch.skillarticles.data.ArticleData
-import ru.skillbranch.skillarticles.data.ArticlePersonalInfo
+import ru.skillbranch.skillarticles.data.models.ArticleData
+import ru.skillbranch.skillarticles.data.models.ArticlePersonalInfo
+import ru.skillbranch.skillarticles.data.models.CommentItemData
 import ru.skillbranch.skillarticles.data.repositories.ArticleRepository
+import ru.skillbranch.skillarticles.data.repositories.CommentsDataFactory
 import ru.skillbranch.skillarticles.extensions.data.toAppSettings
 import ru.skillbranch.skillarticles.extensions.data.toArticlePersonalInfo
 import ru.skillbranch.skillarticles.extensions.format
@@ -22,6 +23,7 @@ import ru.skillbranch.skillarticles.viewmodels.base.BaseViewModel
 import ru.skillbranch.skillarticles.viewmodels.base.IViewModelState
 import ru.skillbranch.skillarticles.viewmodels.base.NavigationCommand
 import ru.skillbranch.skillarticles.viewmodels.base.Notify
+import java.util.concurrent.Executors
 
 class ArticleViewModel(
     handle: SavedStateHandle,
@@ -40,7 +42,7 @@ class ArticleViewModel(
     }
 
     private val listData: LiveData<PagedList<CommentItemData>> = Transformations.switchMap(getArticleData()) {
-        buildPagedList(repository.allComments(articleId, it?.commentCount? : 0))
+        buildPagedList(repository.allComments(articleId, it?.commentCount ?: 0))
     }
 
     fun handleCommentFocus(hasFocus: Boolean) {
@@ -48,11 +50,11 @@ class ArticleViewModel(
     }
 
     fun handleClearComment() {
-        updateState { it.copy(answerTo = null, answewrToSlug = null) }
+        updateState { it.copy(answerTo = null, answerToSlug = null) }
     }
 
     fun handleReplyTo(slug: String, name: String) {
-        updateState { it.copy(answewrToSlug = slug, answerTo = "Reply to $name") }
+        updateState { it.copy(answerToSlug = slug, answerTo = "Reply to $name") }
     }
 
     init {
@@ -113,14 +115,14 @@ class ArticleViewModel(
         owner: LifecycleOwner,
         onChanged: (list: PagedList<CommentItemData>) -> Unit
     ) {
-        listData.observe(woner, Observer { onChanged(it) })
+        listData.observe(owner, Observer { onChanged(it) })
     }
 
     private fun buildPagedList(
         dataFactory : CommentsDataFactory
     ) : LiveData<PagedList<CommentItemData>> {
         return LivePagedListBuilder<String, CommentItemData>(dataFactory, listConfig)
-            .setFetchExecutor(Executors.newSingleTHreadExecutor())
+            .setFetchExecutor(Executors.newSingleThreadExecutor())
             .build()
     }
 
