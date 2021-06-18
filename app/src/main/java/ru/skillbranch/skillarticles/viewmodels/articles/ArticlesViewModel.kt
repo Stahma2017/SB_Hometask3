@@ -29,7 +29,6 @@ class ArticlesViewModel(handle: SavedStateHandle) : BaseViewModel<ArticlesState>
     }
 
     private val listData = Transformations.switchMap(state) {
-        Log.d("TEST45", "listData changed")
         when {
             it.isSearch && !it.searchQuery.isNullOrBlank() -> buildPagedList(repository.searchArticles(it.searchQuery))
             else -> buildPagedList(repository.allArticles())
@@ -98,7 +97,7 @@ class ArticlesViewModel(handle: SavedStateHandle) : BaseViewModel<ArticlesState>
     }
 
     fun handleToggleBookmark(id: String, isChecked: Boolean) {
-        repository.updateBookmark(id, isChecked)
+        repository.updateBookmark(id, !isChecked)
         listData.value?.dataSource?.invalidate()
     }
 }
