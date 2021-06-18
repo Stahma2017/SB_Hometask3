@@ -83,7 +83,8 @@ class BookmarksViewModel(handle: SavedStateHandle) : BaseViewModel<BookmarksStat
     }
 
     fun handleToggleBookmark(id: String, isChecked: Boolean) {
-
+        repository.updateBookmark(id, !isChecked)
+        listData.value?.dataSource?.invalidate()
     }
 
     fun observeList(
