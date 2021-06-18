@@ -11,7 +11,6 @@ import ru.skillbranch.skillarticles.data.models.ArticleItemData
 import ru.skillbranch.skillarticles.data.repositories.ArticleStrategy
 import ru.skillbranch.skillarticles.data.repositories.ArticlesDataFactory
 import ru.skillbranch.skillarticles.data.repositories.ArticlesRepository
-import ru.skillbranch.skillarticles.viewmodels.articles.ArticlesBoundaryCallback
 import ru.skillbranch.skillarticles.viewmodels.base.BaseViewModel
 import ru.skillbranch.skillarticles.viewmodels.base.IViewModelState
 import ru.skillbranch.skillarticles.viewmodels.base.Notify
@@ -64,7 +63,6 @@ class BookmarksViewModel(handle: SavedStateHandle) : BaseViewModel<BookmarksStat
             val items = repository.findBookmarkedArticles(start = lastLoadArticle.id.toInt(), size = listConfig.pageSize)
             Log.d("TEST18", "itemAtEndHandle  repository.findBookmarkedArticles(${lastLoadArticle.id.toInt()}, ${listConfig.pageSize})")
             if (items.isNotEmpty()) {
-                //listData.value?.dataSource?.invalidate()
             }
 
             withContext(Dispatchers.Main) {
