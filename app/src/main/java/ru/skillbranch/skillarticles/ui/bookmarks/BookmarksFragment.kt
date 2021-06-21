@@ -129,5 +129,4 @@ class BookmarksFragment : BaseFragment<BookmarksViewModel>() {
         }
     }
 
-
 }

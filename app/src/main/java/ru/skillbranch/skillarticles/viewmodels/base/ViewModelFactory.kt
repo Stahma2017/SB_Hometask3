@@ -14,8 +14,7 @@ class ViewModelFactory(
     override fun <T : ViewModel?> create(
         key: String,
         modelClass: Class<T>,
-        handle: SavedStateHandle
-    ): T {
+        handle: SavedStateHandle): T {
         if (modelClass.isAssignableFrom(ArticleViewModel::class.java)) {
             return ArticleViewModel(handle, params as String) as T
         }

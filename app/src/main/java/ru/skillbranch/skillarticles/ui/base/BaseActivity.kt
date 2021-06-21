@@ -12,7 +12,6 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.os.bundleOf
 import androidx.core.view.children
 import androidx.core.view.isVisible
-import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.FragmentActivity
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
@@ -22,7 +21,6 @@ import com.google.android.material.behavior.HideBottomViewOnScrollBehavior
 import kotlinx.android.synthetic.main.activity_root.*
 import ru.skillbranch.skillarticles.R
 import ru.skillbranch.skillarticles.extensions.dpToIntPx
-import ru.skillbranch.skillarticles.ui.custom.Bottombar
 import ru.skillbranch.skillarticles.viewmodels.base.BaseViewModel
 import ru.skillbranch.skillarticles.viewmodels.base.IViewModelState
 import ru.skillbranch.skillarticles.viewmodels.base.NavigationCommand

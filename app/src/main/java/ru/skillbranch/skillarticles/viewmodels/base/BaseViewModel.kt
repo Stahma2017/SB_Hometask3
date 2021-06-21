@@ -12,8 +12,6 @@ abstract class BaseViewModel<T: IViewModelState>(private val handleState: SavedS
     @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
     val notifications = MutableLiveData<Event<Notify>>()
 
-
-
     @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
     val navigation = MutableLiveData<Event<NavigationCommand>>()
 
