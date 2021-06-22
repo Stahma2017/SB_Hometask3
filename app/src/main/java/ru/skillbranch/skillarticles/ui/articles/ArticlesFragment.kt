@@ -6,8 +6,10 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.viewModels
+import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.fragment_articles.*
 import ru.skillbranch.skillarticles.R
 import ru.skillbranch.skillarticles.ui.base.BaseFragment
@@ -106,6 +108,14 @@ class ArticlesFragment : BaseFragment<ArticlesViewModel>() {
             layoutManager = LinearLayoutManager(context)
             adapter = articlesAdapter
             addItemDecoration(DividerItemDecoration(context, LinearLayoutManager.VERTICAL))
+            addOnScrollListener(object: RecyclerView.OnScrollListener() {
+                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                    val position = (recyclerView.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
+                    val lastKey = (this@with.adapter as PagedListAdapter<*, *>).currentList?.lastKey
+                    Log.d("TEST18", "position is $position, lastKey is $lastKey")
+                    super.onScrolled(recyclerView, dx, dy)
+                }
+            })
         }
 
         viewModel.observeList(viewLifecycleOwner) {
