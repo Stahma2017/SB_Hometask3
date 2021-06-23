@@ -295,6 +295,7 @@ class ArticleFragment : BaseFragment<ArticleViewModel>(), IArticleView {
         private var searchPosition: Int by RenderProp(0)
 
         private var answerTo by RenderProp("Comment") { wrap_comments.hint = it }
+        private var comment by RenderProp("") { et_comment.setText(it) }
         private var isShowBottombar by RenderProp(true) {
             if (it) bottombar.show() else bottombar.hide()
             if (submenu.isOpen) submenu.isVisible = it
@@ -342,6 +343,7 @@ class ArticleFragment : BaseFragment<ArticleViewModel>(), IArticleView {
             searchResults = data.searchResults
             answerTo = data.answerTo ?: "Comment"
             isShowBottombar = data.showBottomBar
+            comment = data.currentComment
         }
 
         override fun saveUi(outState: Bundle) {
