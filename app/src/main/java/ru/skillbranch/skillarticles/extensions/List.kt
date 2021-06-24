@@ -1,37 +1,40 @@
 package ru.skillbranch.skillarticles.extensions
 
 fun List<Pair<Int, Int>>.groupByBounds(bounds: List<Pair<Int, Int>>): List<List<Pair<Int, Int>>> {
-    val list: MutableList<List<Pair<Int, Int>>> = mutableListOf()
-    var indexPointer = 0
 
-    bounds.forEach { bound ->
-        var boundFirst: Int?
-        var boundSecond: Int?
-        val boundList = mutableListOf<Pair<Int, Int>>()
+    val results= List<MutableList<Pair<Int, Int>>>(bounds.size){mutableListOf()}
 
+    var lastResult = 0
 
-        while (indexPointer < size && (bound.second in get(indexPointer).first..get(indexPointer).second || get(indexPointer).second in bound.first..bound.second)) {
+    bounds@ for ((index, bound) in bounds.withIndex()) {
+        var lastIndex = bound.first
+        results@ for (result in subList(lastResult, size)) {
+            val boundRange = lastIndex..bound.second
 
-            if (get(indexPointer).first in bound.first..bound.second) {
-                boundFirst = get(indexPointer).first
-            } else {
-                boundFirst = bound.first
+            when {
+                result.first in boundRange && result.second in boundRange -> {
+                        results[index].add(result.first to result.second)
+                        lastResult++
+                        lastIndex = result.second
+                }
+
+                result.first in boundRange && result.second !in boundRange -> {
+                    if(result.first != bound.second){
+                        results[index].add(result.first to bound.second)
+                    }
+                    continue@bounds
+                }
+
+                result.first !in boundRange && result.second in boundRange -> {
+                    if(bound.first != result.second){
+                        results[index].add(bound.first to result.second)
+                    }
+                    lastResult++
+                    continue@results
+                }
             }
-
-            if (get(indexPointer).second in bound.first..bound.second) {
-                boundSecond = get(indexPointer).second
-                indexPointer++
-            } else {
-                boundSecond = bound.second
-                boundList.add(Pair(boundFirst, boundSecond))
-                break
-            }
-
-            boundList.add(Pair(boundFirst, boundSecond))
         }
-
-        list.add(boundList.toList())
     }
-    return list
-}
 
+    return results
+}

@@ -11,7 +11,6 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.animation.doOnEnd
 import androidx.core.animation.doOnStart
 import com.google.android.material.shape.MaterialShapeDrawable
-import ru.skillbranch.skillarticles.R
 import ru.skillbranch.skillarticles.extensions.dpToPx
 import ru.skillbranch.skillarticles.ui.custom.behaviors.SubmenuBehavior
 import kotlin.math.hypot
@@ -20,20 +19,21 @@ class ArticleSubmenu @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
-) : ConstraintLayout(context, attrs, defStyleAttr), CoordinatorLayout.AttachedBehavior {
+) : ConstraintLayout(context, attrs, defStyleAttr) , CoordinatorLayout.AttachedBehavior {
+    override fun getBehavior(): CoordinatorLayout.Behavior<ArticleSubmenu> {
+        return SubmenuBehavior()
+    }
     var isOpen = false
-    private var centerX : Float = context.dpToPx(200)
-    private var centerY : Float = context.dpToPx(96)
+    private var centerX: Float = context.dpToPx(200)
+    private var centerY: Float = context.dpToPx(96)
 
     init {
+        requestLayout()
+//        View.inflate(context, R.layout.layout_submenu, this)
+        //add material bg for handle elevation and color surface
         val materialBg = MaterialShapeDrawable.createWithElevationOverlay(context)
         materialBg.elevation = elevation
         background = materialBg
-    }
-
-
-    override fun getBehavior(): CoordinatorLayout.Behavior<*> {
-        return SubmenuBehavior<ArticleSubmenu>()
     }
 
     fun open() {
@@ -50,11 +50,13 @@ class ArticleSubmenu @JvmOverloads constructor(
 
     private fun animatedShow() {
         val endRadius = hypot(centerX, centerY).toInt()
-        val anim = ViewAnimationUtils.createCircularReveal(this,
+        val anim = ViewAnimationUtils.createCircularReveal(
+            this,
             centerX.toInt(),
             centerY.toInt(),
             0f,
-            endRadius.toFloat())
+            endRadius.toFloat()
+        )
         anim.doOnStart {
             visibility = View.VISIBLE
         }
@@ -63,24 +65,28 @@ class ArticleSubmenu @JvmOverloads constructor(
 
     private fun animatedHide() {
         val endRadius = hypot(centerX, centerY).toInt()
-        val anim = ViewAnimationUtils.createCircularReveal(this,
+        val anim = ViewAnimationUtils.createCircularReveal(
+            this,
             centerX.toInt(),
             centerY.toInt(),
             endRadius.toFloat(),
-            0f)
+            0f
+        )
         anim.doOnEnd {
             visibility = View.GONE
         }
         anim.start()
     }
 
+    //save state
     override fun onSaveInstanceState(): Parcelable? {
         val savedState = SavedState(super.onSaveInstanceState())
         savedState.ssIsOpen = isOpen
         return savedState
     }
 
-    override fun onRestoreInstanceState(state: Parcelable?) {
+    //restore state
+    override fun onRestoreInstanceState(state: Parcelable) {
         super.onRestoreInstanceState(state)
         if (state is SavedState) {
             isOpen = state.ssIsOpen
@@ -89,24 +95,25 @@ class ArticleSubmenu @JvmOverloads constructor(
     }
 
     private class SavedState : BaseSavedState, Parcelable {
-        var ssIsOpen : Boolean = false
+        var ssIsOpen: Boolean = false
 
         constructor(superState: Parcelable?) : super(superState)
-        constructor(src : Parcel) : super(src) {
+
+        constructor(src: Parcel) : super(src) {
             ssIsOpen = src.readInt() == 1
         }
 
-        override fun writeToParcel(out: Parcel, flags: Int) {
-            super.writeToParcel(out, flags)
-            out.writeInt(if (ssIsOpen) 1 else 0)
+        override fun writeToParcel(dst: Parcel, flags: Int) {
+            super.writeToParcel(dst, flags)
+            dst.writeInt(if (ssIsOpen) 1 else 0)
         }
 
-        override fun describeContents(): Int = 0
-
+        override fun describeContents() = 0
 
         companion object CREATOR : Parcelable.Creator<SavedState> {
-            override fun createFromParcel(source: Parcel): SavedState = SavedState(source)
+            override fun createFromParcel(parcel: Parcel) = SavedState(parcel)
             override fun newArray(size: Int): Array<SavedState?> = arrayOfNulls(size)
         }
     }
+
 }

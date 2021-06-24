@@ -57,7 +57,6 @@ class HorizontalRuleSpan(
         style = Paint.Style.STROKE
         strokeWidth = ruleWidth
 
-
         block()
 
         color = oldColor

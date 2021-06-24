@@ -5,15 +5,17 @@ import android.view.ViewGroup
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.extensions.LayoutContainer
 import ru.skillbranch.skillarticles.data.models.ArticleItemData
 import ru.skillbranch.skillarticles.ui.custom.ArticleItemView
 
-class ArticlesAdapter(private val listener: (ArticleItemData) -> Unit, private val toggleBookmarkListener: (String, Boolean) -> Unit) : PagedListAdapter<ArticleItemData, ArticleVH>(ArticleDiffCallback()) {
+class ArticlesAdapter(
+    private val listener: (ArticleItemData, Boolean) -> Unit
+) :
+    PagedListAdapter<ArticleItemData, ArticleVH>(ArticleDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ArticleVH {
         val view = ArticleItemView(parent.context)
-        return ArticleVH(view, toggleBookmarkListener)
+        return ArticleVH(view)
     }
 
     override fun onBindViewHolder(holder: ArticleVH, position: Int) {
@@ -21,19 +23,20 @@ class ArticlesAdapter(private val listener: (ArticleItemData) -> Unit, private v
     }
 }
 
-class ArticleDiffCallback: DiffUtil.ItemCallback<ArticleItemData>() {
+class ArticleDiffCallback : DiffUtil.ItemCallback<ArticleItemData>() {
+    override fun areItemsTheSame(oldItem: ArticleItemData, newItem: ArticleItemData): Boolean =
+        oldItem.id == newItem.id
 
-    override fun areItemsTheSame(oldItem: ArticleItemData, newItem: ArticleItemData): Boolean = oldItem.id == newItem.id
-
-    override fun areContentsTheSame(oldItem: ArticleItemData, newItem: ArticleItemData): Boolean = oldItem == newItem
+    override fun areContentsTheSame(oldItem: ArticleItemData, newItem: ArticleItemData): Boolean =
+        oldItem == newItem
 }
 
-class ArticleVH(override val containerView: View, private val toggleBookmarkListener: (String, Boolean) -> Unit) : RecyclerView.ViewHolder(containerView), LayoutContainer {
-
-    fun bind(item: ArticleItemData?, listener: (ArticleItemData) -> Unit) {
-        // if use placeholder item me be null
-        (containerView as ArticleItemView).bind(item!!, toggleBookmarkListener)
-        itemView.setOnClickListener { listener(item!!) }
+class ArticleVH(val containerView: View) : RecyclerView.ViewHolder(containerView) {
+    fun bind(
+        item: ArticleItemData?,
+        listener: (ArticleItemData, Boolean) -> Unit
+    ) {
+        (containerView as ArticleItemView).bind(item!!, listener)
     }
 
 }

@@ -1,17 +1,14 @@
 package ru.skillbranch.skillarticles.data
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import ru.skillbranch.skillarticles.R
 import ru.skillbranch.skillarticles.data.EntityGenerator.generateArticleItems
 import ru.skillbranch.skillarticles.data.EntityGenerator.generateComments
 import ru.skillbranch.skillarticles.data.models.*
 import java.util.*
-
 
 object LocalDataHolder {
     private val articleInfo = MutableLiveData<ArticlePersonalInfo?>(null)
@@ -22,7 +19,6 @@ object LocalDataHolder {
 
     fun findArticle(articleId: String): LiveData<ArticleData?> {
         if (localArticles[articleId] == null) {
-            Log.e("DataHolder", "findArticle $articleId: ");
             val article = localArticleItems.find { it.id == articleId }
             localArticles[articleId] = MutableLiveData(EntityGenerator.generateArticle(article ?: EntityGenerator.createArticleItem(articleId)))
         }
@@ -100,5 +96,8 @@ object NetworkDataHolder {
         )
     }
 }
+
+
+
 
 

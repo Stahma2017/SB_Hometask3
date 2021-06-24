@@ -11,6 +11,7 @@ import androidx.appcompat.content.res.AppCompatResources.getDrawable
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.os.bundleOf
 import androidx.core.view.children
+import androidx.core.view.doOnNextLayout
 import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentActivity
 import androidx.navigation.NavController
@@ -19,6 +20,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions.circleCropTransform
 import com.google.android.material.behavior.HideBottomViewOnScrollBehavior
 import kotlinx.android.synthetic.main.activity_root.*
+import kotlinx.android.synthetic.main.activity_root.view.*
 import ru.skillbranch.skillarticles.R
 import ru.skillbranch.skillarticles.extensions.dpToIntPx
 import ru.skillbranch.skillarticles.viewmodels.base.BaseViewModel
@@ -27,7 +29,6 @@ import ru.skillbranch.skillarticles.viewmodels.base.NavigationCommand
 import ru.skillbranch.skillarticles.viewmodels.base.Notify
 
 abstract class BaseActivity<T : BaseViewModel<out IViewModelState>> : AppCompatActivity() {
-
     protected abstract val viewModel: T
     protected abstract val layout: Int
     lateinit var navController: NavController
@@ -37,6 +38,7 @@ abstract class BaseActivity<T : BaseViewModel<out IViewModelState>> : AppCompatA
 
     //set listeners, tuning views
     abstract fun subscribeOnState(state: IViewModelState)
+
     abstract fun renderNotification(notify: Notify)
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,6 +48,7 @@ abstract class BaseActivity<T : BaseViewModel<out IViewModelState>> : AppCompatA
         viewModel.observeState(this) { subscribeOnState(it) }
         viewModel.observeNotifications(this) { renderNotification(it) }
         viewModel.observeNavigation(this) { subscribeOnNavigation(it) }
+
         navController = findNavController(R.id.nav_host_fragment)
     }
 
@@ -74,20 +77,22 @@ abstract class BaseActivity<T : BaseViewModel<out IViewModelState>> : AppCompatA
                 )
             }
 
-            is NavigationCommand.StartLogin -> {
-                navController.navigate(R.id.start_login,
-                    bundleOf("private_destination" to (command.privateDestination ?: -1)))
-            }
-
             is NavigationCommand.FinishLogin -> {
                 navController.navigate(R.id.finish_login)
                 if (command.privateDestination != null) navController.navigate(command.privateDestination)
+            }
+
+            is NavigationCommand.StartLogin -> {
+                navController.navigate(
+                    R.id.start_login,
+                    bundleOf("private_destination" to (command.privateDestination ?: -1))
+                )
             }
         }
     }
 }
 
-class ToolbarBuilder {
+class ToolbarBuilder() {
     var title: String? = null
     var subtitle: String? = null
     var logo: String? = null
@@ -106,11 +111,6 @@ class ToolbarBuilder {
 
     fun setLogo(logo: String): ToolbarBuilder {
         this.logo = logo
-        return this
-    }
-
-    fun setVisibility(isVisible: Boolean): ToolbarBuilder {
-        this.visibility = isVisible
         return this
     }
 
@@ -134,6 +134,7 @@ class ToolbarBuilder {
     }
 
     fun build(context: FragmentActivity) {
+
         //show appbar if hidden due to scroll behavior
         context.appbar.setExpanded(true, true)
 
@@ -144,9 +145,11 @@ class ToolbarBuilder {
                 val logoSize = context.dpToIntPx(40)
                 val logoMargin = context.dpToIntPx(16)
                 val logoPlaceholder = getDrawable(context, R.drawable.logo_placeholder)
+
                 logo = logoPlaceholder
-                val logo = children.last() as? ImageView
-                if (logo != null) {
+                toolbar.logoDescription = "logo"
+                toolbar.doOnNextLayout {
+                    val logo =children.filter { it.contentDescription == "logo" }.first() as ImageView
                     logo.scaleType = ImageView.ScaleType.CENTER_CROP
                     (logo.layoutParams as? Toolbar.LayoutParams)?.let {
                         it.width = logoSize
@@ -166,7 +169,6 @@ class ToolbarBuilder {
             }
         }
     }
-
 }
 
 data class MenuItemHolder(
@@ -177,7 +179,7 @@ data class MenuItemHolder(
     val clickListener: ((MenuItem) -> Unit)? = null
 )
 
-class BottombarBuilder {
+class BottombarBuilder() {
     private var visible: Boolean = true
     private val views = mutableListOf<Int>()
     private val tempViews = mutableListOf<Int>()
@@ -187,17 +189,17 @@ class BottombarBuilder {
         return this
     }
 
-    fun setVisibility(isVisible: Boolean) : BottombarBuilder {
+    fun setVisibility(isVisible: Boolean): BottombarBuilder {
         visible = isVisible
         return this
     }
 
-    fun prepare(prepareFn: (BottombarBuilder.() -> Unit)?) : BottombarBuilder {
+    fun prepare(prepareFn: (BottombarBuilder.() -> Unit)?): BottombarBuilder {
         prepareFn?.invoke(this)
         return this
     }
 
-    fun invalidate() : BottombarBuilder{
+    fun invalidate(): BottombarBuilder {
         visible = true
         views.clear()
         return this
@@ -211,10 +213,12 @@ class BottombarBuilder {
                 val view = context.container.findViewById<View>(it)
                 context.container.removeView(view)
             }
+
             tempViews.clear()
+//            context.clearFindViewByIdCache()
         }
 
-        // add new bottom bar view
+        //add new bottom bar views
         if (views.isNotEmpty()) {
             val inflater = LayoutInflater.from(context)
             views.forEach {
@@ -226,11 +230,11 @@ class BottombarBuilder {
 
         with(context.nav_view) {
             isVisible = visible
-
             //show bottombar if hidden due to scroll behavior
             ((layoutParams as CoordinatorLayout.LayoutParams).behavior as HideBottomViewOnScrollBehavior)
                 .slideUp(this)
         }
+
     }
 
 }

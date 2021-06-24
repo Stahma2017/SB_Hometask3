@@ -11,13 +11,12 @@ import ru.skillbranch.skillarticles.viewmodels.base.IViewModelState
 abstract class BaseFragment<T : BaseViewModel<out IViewModelState>> : Fragment() {
     val root: RootActivity
         get() = activity as RootActivity
-
     open val binding: Binding? = null
-    protected abstract val viewModel : T
-    protected abstract val layout : Int
+    protected abstract val viewModel: T
+    protected abstract val layout: Int
 
-    open val prepareToolbar : (ToolbarBuilder.() -> Unit)? = null
-    open val prepareBottombar : (BottombarBuilder.() -> Unit)? = null
+    open val prepareToolbar: (ToolbarBuilder.() -> Unit)? = null
+    open val prepareBottombar: (BottombarBuilder.() -> Unit)? = null
 
     val toolbar
         get() = root.toolbar
@@ -30,6 +29,7 @@ abstract class BaseFragment<T : BaseViewModel<out IViewModelState>> : Fragment()
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? = inflater.inflate(layout, container, false)
+
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -49,11 +49,14 @@ abstract class BaseFragment<T : BaseViewModel<out IViewModelState>> : Fragment()
         viewModel.restoreState()
         binding?.restoreUi(savedInstanceState)
 
+        //owner it is view
         viewModel.observeState(viewLifecycleOwner) { binding?.bind(it) }
         //bind default values if viewmodel not loaded data
         if (binding?.isInflated == false) binding?.onFinishInflate()
+
         viewModel.observeNotifications(viewLifecycleOwner) { root.renderNotification(it) }
         viewModel.observeNavigation(viewLifecycleOwner) { root.viewModel.navigate(it) }
+
         setupViews()
     }
 
@@ -83,4 +86,5 @@ abstract class BaseFragment<T : BaseViewModel<out IViewModelState>> : Fragment()
         } else menu.clear()
         super.onPrepareOptionsMenu(menu)
     }
+
 }

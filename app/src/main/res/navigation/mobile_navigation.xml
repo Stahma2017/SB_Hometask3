@@ -41,8 +41,12 @@
         android:label="@string/title_articles"
         tools:layout="@layout/fragment_articles" >
         <action
-            android:id="@+id/action_nav_articles_to_page_article"
+            android:id="@+id/action_to_page_article"
             app:destination="@id/page_article" />
+        <argument
+            android:name="isBookmarks"
+            app:argType="boolean"
+            android:defaultValue="false" />
     </fragment>
     <fragment
         android:id="@+id/nav_profile"
@@ -51,11 +55,15 @@
         tools:layout="@layout/fragment_profile" />
     <fragment
         android:id="@+id/nav_bookmarks"
-        android:name="ru.skillbranch.skillarticles.ui.bookmarks.BookmarksFragment"
+        android:name="ru.skillbranch.skillarticles.ui.articles.ArticlesFragment"
         android:label="@string/title_bookmarks"
-        tools:layout="@layout/fragment_bookmarks">
+        tools:layout="@layout/fragment_articles" >
+        <argument
+            android:name="isBookmarks"
+            app:argType="boolean"
+            android:defaultValue="true" />
         <action
-            android:id="@+id/action_nav_articles_to_page_article"
+            android:id="@+id/action_to_page_article"
             app:destination="@id/page_article" />
     </fragment>
     <fragment
@@ -72,6 +80,7 @@
             android:name="ru.skillbranch.skillarticles.ui.auth.AuthFragment"
             android:label="@string/title_authorization"
             tools:layout="@layout/fragment_auth" >
+
             <argument
                 android:name="private_destination"
                 app:argType="integer"
@@ -82,6 +91,7 @@
             android:name="ru.skillbranch.skillarticles.ui.auth.PrivacyPolicyFragment"
             android:label="@string/title_privacy_policy"
             tools:layout="@layout/fragment_privacy_policy" />
+
     </navigation>
 
     <!--global actions -->

@@ -22,10 +22,16 @@ abstract class Binding {
     }
 
     abstract fun bind(data: IViewModelState)
+    /**
+     * override this if need save binding in bundle
+     */
     open fun saveUi(outState: Bundle) {
         //empty default implementation
     }
 
+    /**
+     * override this if need restore binding from bundle
+     */
     open fun restoreUi(savedState: Bundle?) {
         //empty default implementation
     }
@@ -49,4 +55,6 @@ abstract class Binding {
             }
         }
     }
+
+
 }

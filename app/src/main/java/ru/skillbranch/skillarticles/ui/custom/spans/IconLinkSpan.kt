@@ -21,11 +21,9 @@ class IconLinkSpan(
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     var iconSize = 0
-
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     var textWidth = 0f
     private val dashs = DashPathEffect(floatArrayOf(dotWidth, dotWidth), 0f)
-
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     var path = Path()
 
@@ -69,7 +67,7 @@ class IconLinkSpan(
     ): Int {
 
         if (fm != null) {
-            iconSize = fm.descent - fm.ascent
+            iconSize = fm.descent - fm.ascent //fontSize
             linkDrawable.setBounds(0, 0, iconSize, iconSize)
         }
         textWidth = paint.measureText(text.toString(), start, end)
@@ -87,7 +85,6 @@ class IconLinkSpan(
         style = Paint.Style.STROKE
         strokeWidth = 0f
 
-
         block()
 
         color = oldColor
@@ -97,12 +94,12 @@ class IconLinkSpan(
 
     private inline fun Paint.forText(block: () -> Unit) {
         val oldColor = color
+
         color = textColor
 
         block()
 
         color = oldColor
     }
-
 
 }
