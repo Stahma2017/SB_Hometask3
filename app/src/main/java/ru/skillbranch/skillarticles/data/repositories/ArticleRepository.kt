@@ -80,7 +80,7 @@ object ArticleRepository: IArticleRepository {
     }
 
     override fun findArticleCommentCount(articleId: String): LiveData<Int> {
-        return articleCountsDao.getCo mmentsCount(articleId)
+        return articleCountsDao.getCommentsCount(articleId)
     }
 
     override fun isAuth(): MutableLiveData<Boolean> = preferences.isAuth()
