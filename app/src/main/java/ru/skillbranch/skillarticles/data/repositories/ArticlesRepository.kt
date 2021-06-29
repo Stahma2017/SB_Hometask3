@@ -185,7 +185,7 @@ class QueryBuilder() {
         check(table != null) {"table must be not null"}
         val strBuilder = StringBuilder("SELECT ")
             .append("$selectColumns ")
-            .append("FROM $table")
+            .append("FROM $table ")
 
         if (joinTables != null) strBuilder.append(joinTables)
         if (whereCondition != null) strBuilder.append(whereCondition)

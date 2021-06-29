@@ -13,7 +13,6 @@ import ru.skillbranch.skillarticles.data.local.dao.ArticleCountsDao
 import ru.skillbranch.skillarticles.data.local.dao.ArticlePersonalInfosDao
 import ru.skillbranch.skillarticles.data.local.dao.ArticlesDao
 import ru.skillbranch.skillarticles.data.local.entities.ArticleFull
-import ru.skillbranch.skillarticles.data.local.entities.ArticlePersonalInfo
 import ru.skillbranch.skillarticles.data.models.*
 import ru.skillbranch.skillarticles.extensions.data.toArticleContent
 import java.lang.Thread.sleep

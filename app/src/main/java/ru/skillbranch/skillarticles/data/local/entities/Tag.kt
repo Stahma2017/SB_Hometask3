@@ -14,7 +14,7 @@ data class Tag(
 )
 
 @Entity(tableName = "article_tag_x_ref",
-primaryKeys = ["t_id, a_id"],
+primaryKeys = ["t_id", "a_id"],
 foreignKeys = [
     ForeignKey(
         entity = Article::class,

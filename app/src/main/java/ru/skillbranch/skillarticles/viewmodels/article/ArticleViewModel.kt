@@ -58,10 +58,6 @@ class ArticleViewModel(
             )
         }
 
-
-
-
-
         subscribeOnDataSource(repository.getAppSettings()) { settings, state ->
             state.copy(
                 isDarkMode = settings.isDarkMode,
