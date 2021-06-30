@@ -127,8 +127,6 @@ class ArticlesViewModel(handle: SavedStateHandle) : BaseViewModel<ArticlesState>
     fun applyCategories(selectedCategories: List<String>) {
         updateState { it.copy(selectedCategories = selectedCategories) }
     }
-
-
 }
 
 private fun ArticlesState.toArticleFilter(): ArticleFilter =
@@ -152,7 +150,6 @@ data class ArticlesState(
 class ArticlesBoundaryCallback(
     private val zeroLoadingHandle: () -> Unit,
     private val itemAtEndHandle: (ArticleItem) -> Unit
-
 ) : PagedList.BoundaryCallback<ArticleItem>() {
     override fun onZeroItemsLoaded() {
         //Storage is empty

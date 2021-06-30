@@ -1,4 +1,4 @@
-package ru.skillbranch.skillarticles.data.local.entities
+package ru.skillbranch.skillarticles.data.local
 
 import androidx.room.TypeConverter
 import ru.skillbranch.skillarticles.data.repositories.MarkdownElement
