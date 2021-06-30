@@ -8,10 +8,7 @@ import androidx.paging.ItemKeyedDataSource
 import ru.skillbranch.skillarticles.data.NetworkDataHolder
 import ru.skillbranch.skillarticles.data.local.DbManager.db
 import ru.skillbranch.skillarticles.data.local.PrefManager
-import ru.skillbranch.skillarticles.data.local.dao.ArticleContentsDao
-import ru.skillbranch.skillarticles.data.local.dao.ArticleCountsDao
-import ru.skillbranch.skillarticles.data.local.dao.ArticlePersonalInfosDao
-import ru.skillbranch.skillarticles.data.local.dao.ArticlesDao
+import ru.skillbranch.skillarticles.data.local.dao.*
 import ru.skillbranch.skillarticles.data.local.entities.ArticleFull
 import ru.skillbranch.skillarticles.data.models.*
 import ru.skillbranch.skillarticles.extensions.data.toArticleContent
@@ -41,18 +38,36 @@ object ArticleRepository: IArticleRepository {
     private var articlePersonalDao = db.articlePersonalInfosDao()
     private var articleCountsDao = db.articleCountsDao()
     private var articleContentDao = db.articleContentsDao()
+    private var categoriesDao = db.categoriesDao()
+    private var tagsDao = db.tagsDao()
+
 
     @VisibleForTesting(otherwise = VisibleForTesting.NONE)
     fun setupTestDao(
         articlesDao: ArticlesDao,
-        articlePersonalDao: ArticlePersonalInfosDao,
         articleCountsDao: ArticleCountsDao,
-        articleContentDao: ArticleContentsDao
+        articleContentDao: ArticleContentsDao,
+        articlePersonalDao: ArticlePersonalInfosDao
     ) {
         this.articlesDao = articlesDao
         this.articlePersonalDao = articlePersonalDao
         this.articleCountsDao = articleCountsDao
         this.articleContentDao = articleContentDao
+    }
+
+    @VisibleForTesting(otherwise = VisibleForTesting.NONE)
+    fun setupTestDao(
+        articlesDao: ArticlesDao,
+        articleCountsDao: ArticleCountsDao,
+        categoriesDao : CategoriesDao,
+        tagsDao: TagsDao,
+        articlePersonalDao: ArticlePersonalInfosDao
+    ) {
+        this.articlesDao = articlesDao
+        this.articlePersonalDao = articlePersonalDao
+        this.articleCountsDao = articleCountsDao
+        this.categoriesDao = categoriesDao
+        this.tagsDao = tagsDao
     }
 
     override fun findArticle(articleId: String): LiveData<ArticleFull> {
@@ -70,7 +85,7 @@ object ArticleRepository: IArticleRepository {
     }
 
     override fun updateSettings(appSettings: AppSettings) {
-        //TODO implement me
+        preferences.updateAppSettings(appSettings)
     }
 
     override fun fetchArticleContent(articleId: String) {

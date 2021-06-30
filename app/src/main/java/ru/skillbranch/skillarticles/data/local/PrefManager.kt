@@ -16,17 +16,26 @@ object PrefManager {
         preferences.edit().clear().apply()
     }
 
+    fun updateAppSettings(appSettings: AppSettings) {
+        preferences.edit().putBoolean(PrefKeys.DARK_MODE.name, appSettings.isDarkMode).apply()
+        preferences.edit().putBoolean(PrefKeys.BIG_TEXT.name, appSettings.isBigText).apply()
+    }
+
     fun getAppSettings(): LiveData<AppSettings> {
-        //TODO implement me
-        return MutableLiveData(AppSettings())
+        return MutableLiveData(AppSettings(preferences.getBoolean(PrefKeys.DARK_MODE.name, false), preferences.getBoolean(PrefKeys.BIG_TEXT.name, false)))
     }
 
     fun isAuth(): MutableLiveData<Boolean> {
-        //TODO implement me
-        return MutableLiveData(false)
+        return MutableLiveData(preferences.getBoolean(PrefKeys.DARK_MODE.name, false))
     }
 
-    fun setAuth(auth: Boolean): Unit {
-        //TODO implement me
+    fun setAuth(auth: Boolean) {
+        preferences.edit().putBoolean(PrefKeys.AUTH.name, auth).apply()
+    }
+
+    private enum class PrefKeys {
+        DARK_MODE,
+        BIG_TEXT,
+        AUTH
     }
 }

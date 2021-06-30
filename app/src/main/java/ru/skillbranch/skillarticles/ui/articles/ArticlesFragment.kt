@@ -56,14 +56,12 @@ class ArticlesFragment : BaseFragment<ArticlesViewModel>() {
                     binding.selectedCategories.toTypedArray(),
                     binding.categories.toTypedArray()
                 )
-
                 viewModel.navigate(NavigationCommand.To(action.actionId, action.arguments))
             }
         )
     }
 
     private val articlesAdapter = ArticlesAdapter { item, isToggleBookmark ->
-
         if (isToggleBookmark) {
             viewModel.handleToggleBookmark(item.id)
         } else {

@@ -19,20 +19,13 @@ interface ArticlesDao : BaseDao<Article>{
             .also { if (it.isNotEmpty()) update(it) }
     }
 
-    @Query("""
-        SELECT * FROM articles
-    """)
+    @Query("""SELECT * FROM articles""")
     fun findArticles(): LiveData<List<Article>>
 
-    @Query("""
-        SELECT * FROM articles
-        WHERE id = :id
-    """)
+    @Query("""SELECT * FROM articles WHERE id = :id""")
     fun findArticleById(id: String) : LiveData<Article>
 
-    @Query("""
-        SELECT * FROM ArticleItem
-    """)
+    @Query("""SELECT * FROM ArticleItem""")
     fun findArticleItems(): LiveData<List<ArticleItem>>
 
     @Delete

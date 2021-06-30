@@ -16,8 +16,7 @@ import ru.skillbranch.skillarticles.viewmodels.base.IViewModelState
 import ru.skillbranch.skillarticles.viewmodels.base.Notify
 import java.util.concurrent.Executors
 
-class ArticlesViewModel(handle: SavedStateHandle) :
-    BaseViewModel<ArticlesState>(handle, ArticlesState()) {
+class ArticlesViewModel(handle: SavedStateHandle) : BaseViewModel<ArticlesState>(handle, ArticlesState()) {
     private val repository = ArticlesRepository
     private val listConfig by lazy {
         PagedList.Config.Builder()
@@ -30,7 +29,6 @@ class ArticlesViewModel(handle: SavedStateHandle) :
     private val listData = Transformations.switchMap(state) {
         val filter = it.toArticleFilter()
         return@switchMap buildPagedList(repository.rawQueryArticles(filter))
-
     }
 
     fun observeList(
@@ -42,9 +40,7 @@ class ArticlesViewModel(handle: SavedStateHandle) :
         listData.observe(owner, Observer { onChange(it) })
     }
 
-    private fun buildPagedList(
-        dataFactory: DataSource.Factory<Int, ArticleItem>
-    ): LiveData<PagedList<ArticleItem>> {
+    private fun buildPagedList(dataFactory: DataSource.Factory<Int, ArticleItem>): LiveData<PagedList<ArticleItem>> {
         val builder = LivePagedListBuilder<Int, ArticleItem>(
             dataFactory,
             listConfig
@@ -96,14 +92,8 @@ class ArticlesViewModel(handle: SavedStateHandle) :
     private fun zeroLoadingHandle() {
         notify(Notify.TextMessage("Storage is empty"))
         viewModelScope.launch(Dispatchers.IO) {
-            val items =
-                repository.loadArticlesFromNetwork(
-                    start = 0,
-                    size = listConfig.initialLoadSizeHint
-                )
-            if (items.isNotEmpty()) {
-                repository.insertArticlesToDb(items)
-            }
+            val items = repository.loadArticlesFromNetwork(start = 0, size = listConfig.initialLoadSizeHint)
+            if (items.isNotEmpty()) { repository.insertArticlesToDb(items) }
         }
     }
 

@@ -1,5 +1,6 @@
 package ru.skillbranch.skillarticles.data.local.dao
 
+import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Transaction
@@ -38,4 +39,21 @@ interface ArticlePersonalInfosDao: BaseDao<ArticlePersonalInfo> {
     fun toggleLikeOrInsert(articleId: String) {
         if (toggleLike(articleId) == 0) insert(ArticlePersonalInfo(articleId = articleId, isLike = true))
     }
+
+    @Query("""
+        SELECT * FROM article_personal_infos
+    """)
+    fun findPersonalInfos(): LiveData<List<ArticlePersonalInfo>>
+
+    @Query("""
+        SELECT * FROM article_personal_infos
+        WHERE article_id = :article_id
+    """)
+    fun findPersonalInfos(article_id: String): LiveData<ArticlePersonalInfo>
+
+    @Query("""
+        SELECT * FROM article_personal_infos
+        WHERE article_id = :articleId
+    """)
+    fun findArticlePersonalInfo(articleId: String): LiveData<ArticlePersonalInfo>
 }
