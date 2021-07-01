@@ -55,7 +55,7 @@ object ArticleRepository: IArticleRepository {
         this.articleContentDao = articleContentDao
     }
 
-    /*@VisibleForTesting(otherwise = VisibleForTesting.NONE)
+    @VisibleForTesting(otherwise = VisibleForTesting.NONE)
     fun setupTestDao(
         articlesDao: ArticlesDao,
         articleCountsDao: ArticleCountsDao,
@@ -68,7 +68,7 @@ object ArticleRepository: IArticleRepository {
         this.articleCountsDao = articleCountsDao
         this.categoriesDao = categoriesDao
         this.tagsDao = tagsDao
-    }*/
+    }
 
     override fun findArticle(articleId: String): LiveData<ArticleFull> {
         return articlesDao.findFullArticle(articleId)

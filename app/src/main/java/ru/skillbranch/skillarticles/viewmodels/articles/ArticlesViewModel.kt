@@ -149,8 +149,7 @@ data class ArticlesState(
 
 class ArticlesBoundaryCallback(
     private val zeroLoadingHandle: () -> Unit,
-    private val itemAtEndHandle: (ArticleItem) -> Unit
-) : PagedList.BoundaryCallback<ArticleItem>() {
+    private val itemAtEndHandle: (ArticleItem) -> Unit) : PagedList.BoundaryCallback<ArticleItem>() {
     override fun onZeroItemsLoaded() {
         //Storage is empty
         zeroLoadingHandle()

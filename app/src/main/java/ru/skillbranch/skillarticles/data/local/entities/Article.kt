@@ -24,7 +24,7 @@ data class Article(
 data class Author(
     @ColumnInfo(name = "user_id")
     val userId: String,
-    val avatar: String? = null,
+    val avatar: String,
     val name: String
 )
 

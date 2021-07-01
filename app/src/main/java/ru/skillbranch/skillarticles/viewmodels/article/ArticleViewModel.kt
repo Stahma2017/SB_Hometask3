@@ -100,7 +100,6 @@ class ArticleViewModel(
                 notify(Notify.TextMessage(msg))
             }
         }
-
     }
 
     override fun handleLike() {
@@ -129,7 +128,6 @@ class ArticleViewModel(
         val msg = "Share is not implemented"
         notify(Notify.ErrorMessage(msg, "OK", null))
     }
-
 
     //session state
     override fun handleToggleMenu() {
@@ -188,7 +186,6 @@ class ArticleViewModel(
                     }
                 }
             }
-
         }
     }
 
@@ -253,7 +250,6 @@ data class ArticleState(
 
 ) : IViewModelState {
     override fun save(outState: SavedStateHandle) {
-
         outState.set("isSearch", isSearch)
         outState.set("searchQuery", searchQuery)
         outState.set("searchResults", searchResults)
