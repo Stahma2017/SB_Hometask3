@@ -42,7 +42,7 @@ object ArticleRepository: IArticleRepository {
     private var tagsDao = db.tagsDao()
 
 
-    @VisibleForTesting(otherwise = VisibleForTesting.NONE)
+    //@VisibleForTesting(otherwise = VisibleForTesting.NONE)
     fun setupTestDao(
         articlesDao: ArticlesDao,
         articlePersonalDao: ArticlePersonalInfosDao,
