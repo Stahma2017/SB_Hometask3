@@ -20,7 +20,7 @@ object PrefManager {
     var isDarkMode by PrefDelegate(false)
     var isBigText by PrefDelegate(false)
 
-    val isAuthLive: LiveData<Boolean> by PrefDelegate("isAuth", false, preferences)
+    val isAuthLive: LiveData<Boolean> by PrefLiveDelegate("isAuth", false, preferences)
 
     val appSettings = MediatorLiveData<AppSettings>().apply {
         val isDarkModeLive: LiveData<Boolean> by PrefLiveDelegate("isDarkMode", false, preferences)
@@ -35,10 +35,6 @@ object PrefManager {
             value = value!!.copy(isBigText = it)
         }
     }.distinctUntilChanged()
-
-    fun isAuth(): MutableLiveData<Boolean> {
-        return MutableLiveData(preferences.getBoolean(PrefKeys.DARK_MODE.name, false))
-    }
 
     fun clearAll() {
         preferences.edit().clear().apply()

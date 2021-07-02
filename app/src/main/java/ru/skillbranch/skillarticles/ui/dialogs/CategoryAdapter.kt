@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import kotlinx.android.extensions.LayoutContainer
+import kotlinx.android.synthetic.main.item_category_dialog.view.*
 import ru.skillbranch.skillarticles.R
 import ru.skillbranch.skillarticles.data.local.entities.CategoryData
 
@@ -25,21 +26,21 @@ class CategoryAdapter(private val listener: (String, Boolean) -> Unit): ListAdap
 
 class CategoryVH(override val containerView: View, val listener: (String, Boolean) -> Unit) : RecyclerView.ViewHolder(containerView), LayoutContainer {
     fun bind(item: CategoryDataItem) {
-        ch_select.setOnCheckedChangeListener(null)
+        containerView.ch_select.setOnCheckedChangeListener(null)
 
-        ch_select.isChecked = item.isChecked
+        containerView.ch_select.isChecked = item.isChecked
         Glide.with(containerView.context)
             .load(item.icon)
             .apply(RequestOptions.circleCropTransform())
-            .override(iv_icon.width)
-            .into(iv_icon)
+            .override(containerView.iv_icon.width)
+            .into(containerView.iv_icon)
 
-        tv_category.text = item.title
-        tv_count_text = "${item.articlesCount}"
+        containerView.tv_category.text = item.title
+        containerView.tv_count.text = "${item.articlesCount}"
 
         //set listeners
-        ch_select.setOnCheckedChangeListener { _, checked -> listener(item.categoryId, checked) }
-        itemView.setOnClickListener { ch_select.toggle() }
+        containerView.ch_select.setOnCheckedChangeListener { _, checked -> listener(item.categoryId, checked) }
+        itemView.setOnClickListener { containerView.ch_select.toggle() }
     }
 }
 
@@ -59,5 +60,5 @@ data class CategoryDataItem(
     val icon: String,
     val title: String,
     val articlesCount: Int = 0,
-    val checked: Boolean
+    val isChecked: Boolean
 )

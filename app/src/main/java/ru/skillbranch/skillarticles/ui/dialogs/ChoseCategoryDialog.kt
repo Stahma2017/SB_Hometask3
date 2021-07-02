@@ -32,7 +32,7 @@ class ChoseCategoryDialog : DialogFragment() {
         categoryAdapter.submitList(categoryItems)
 
         //inflate list
-        val listView = LayoutInflater.inflate(R.layout.fragment_choose_category_dialog, null) as RecyclerView
+        val listView = LayoutInflater.from(context).inflate(R.layout.fragment_choose_category_dialog, null) as RecyclerView
 
         //list settings
         with(listView) {
