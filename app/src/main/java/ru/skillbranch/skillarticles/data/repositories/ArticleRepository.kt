@@ -74,7 +74,7 @@ object ArticleRepository: IArticleRepository {
         return articlesDao.findFullArticle(articleId)
     }
 
-    override fun getAppSettings(): LiveData<AppSettings> = preferences.getAppSettings() //from preferences
+    override fun getAppSettings(): LiveData<AppSettings> = preferences.appSettings //from preferences
 
     override fun toggleLike(articleId: String) {
         articlePersonalDao.toggleLikeOrInsert(articleId)
@@ -85,7 +85,8 @@ object ArticleRepository: IArticleRepository {
     }
 
     override fun updateSettings(appSettings: AppSettings) {
-        preferences.updateAppSettings(appSettings)
+        preferences.isDarkMode = appSettings.isDarkMode
+        preferences.isBigText = appSettings.isBigText
     }
 
     override fun fetchArticleContent(articleId: String) {
