@@ -38,11 +38,11 @@ object ArticleRepository: IArticleRepository {
     private var articlePersonalDao = db.articlePersonalInfosDao()
     private var articleCountsDao = db.articleCountsDao()
     private var articleContentDao = db.articleContentsDao()
-    private var categoriesDao = db.categoriesDao()
-    private var tagsDao = db.tagsDao()
+    /*private var categoriesDao = db.categoriesDao()
+    private var tagsDao = db.tagsDao()*/
 
 
-    //@VisibleForTesting(otherwise = VisibleForTesting.NONE)
+    @VisibleForTesting(otherwise = VisibleForTesting.NONE)
     fun setupTestDao(
         articlesDao: ArticlesDao,
         articlePersonalDao: ArticlePersonalInfosDao,
@@ -53,21 +53,6 @@ object ArticleRepository: IArticleRepository {
         this.articlePersonalDao = articlePersonalDao
         this.articleCountsDao = articleCountsDao
         this.articleContentDao = articleContentDao
-    }
-
-    @VisibleForTesting(otherwise = VisibleForTesting.NONE)
-    fun setupTestDao(
-        articlesDao: ArticlesDao,
-        articleCountsDao: ArticleCountsDao,
-        categoriesDao : CategoriesDao,
-        tagsDao: TagsDao,
-        articlePersonalDao: ArticlePersonalInfosDao
-    ) {
-        this.articlesDao = articlesDao
-        this.articlePersonalDao = articlePersonalDao
-        this.articleCountsDao = articleCountsDao
-        this.categoriesDao = categoriesDao
-        this.tagsDao = tagsDao
     }
 
     override fun findArticle(articleId: String): LiveData<ArticleFull> {
