@@ -20,7 +20,7 @@ class PrefLiveDelegate<T>(
     }
 }
 
-internal  class SharedPreferenceLiveData<T>(
+internal class SharedPreferenceLiveData<T>(
     var sharedPrefs: SharedPreferences,
     var key: String,
     var defValue: T

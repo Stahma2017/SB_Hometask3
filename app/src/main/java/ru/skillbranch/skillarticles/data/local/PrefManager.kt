@@ -3,7 +3,6 @@ package ru.skillbranch.skillarticles.data.local
 import android.content.SharedPreferences
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.distinctUntilChanged
 import androidx.preference.PreferenceManager
 import ru.skillbranch.skillarticles.App
@@ -16,12 +15,11 @@ object PrefManager {
         PreferenceManager.getDefaultSharedPreferences(App.applicationContext())
     }
 
+    var isAuth by PrefDelegate(false)
     var isDarkMode by PrefDelegate(false)
     var isBigText by PrefDelegate(false)
 
-    fun clearAll() {
-        preferences.edit().clear().apply()
-    }
+    val isAuthLive: LiveData<Boolean> by PrefLiveDelegate("isAuth", false, preferences)
 
     val appSettings = MediatorLiveData<AppSettings>().apply {
         val isDarkModeLive: LiveData<Boolean> by PrefLiveDelegate("isDarkMode", false, preferences)
@@ -37,26 +35,8 @@ object PrefManager {
         }
     }.distinctUntilChanged()
 
-    fun updateAppSettings(appSettings: AppSettings) {
-        preferences.edit().putBoolean(PrefKeys.DARK_MODE.name, appSettings.isDarkMode).apply()
-        preferences.edit().putBoolean(PrefKeys.BIG_TEXT.name, appSettings.isBigText).apply()
+    fun clearAll() {
+        preferences.edit().clear().apply()
     }
 
-    /*fun getAppSettings(): LiveData<AppSettings> {
-        return MutableLiveData(AppSettings(preferences.getBoolean(PrefKeys.DARK_MODE.name, false), preferences.getBoolean(PrefKeys.BIG_TEXT.name, false)))
-    }*/
-
-    fun isAuth(): MutableLiveData<Boolean> {
-        return MutableLiveData(preferences.getBoolean(PrefKeys.DARK_MODE.name, false))
-    }
-
-    fun setAuth(auth: Boolean) {
-        preferences.edit().putBoolean(PrefKeys.AUTH.name, auth).apply()
-    }
-
-    private enum class PrefKeys {
-        DARK_MODE,
-        BIG_TEXT,
-        AUTH
-    }
 }
