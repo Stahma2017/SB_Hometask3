@@ -1,43 +1,70 @@
 package ru.skillbranch.skillarticles.data.repositories
 
+import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.LiveData
 import androidx.paging.DataSource
 import androidx.paging.PositionalDataSource
 import androidx.sqlite.db.SimpleSQLiteQuery
-import ru.skillbranch.skillarticles.data.NetworkDataHolder
 import ru.skillbranch.skillarticles.data.local.DbManager.db
+import ru.skillbranch.skillarticles.data.local.dao.*
 import ru.skillbranch.skillarticles.data.local.entities.ArticleItem
 import ru.skillbranch.skillarticles.data.local.entities.ArticleTagXRef
 import ru.skillbranch.skillarticles.data.local.entities.CategoryData
 import ru.skillbranch.skillarticles.data.local.entities.Tag
+import ru.skillbranch.skillarticles.data.remote.NetworkManager
 import ru.skillbranch.skillarticles.data.remote.res.ArticleRes
 import ru.skillbranch.skillarticles.extensions.data.toArticle
+import ru.skillbranch.skillarticles.extensions.data.toArticleContent
 import ru.skillbranch.skillarticles.extensions.data.toArticleCounts
-import java.lang.Thread.sleep
+import ru.skillbranch.skillarticles.extensions.data.toCategory
 
 interface IArticlesRepository {
-    fun loadArticlesFromNetwork(start: Int = 0, size: Int) : List<ArticleRes>
-    fun insertArticlesToDb(articles: List<ArticleRes>)
-    fun toggleBookmark(articleId: String)
-    fun findTags() : LiveData<List<String>>
-    fun findCategoriesData() : LiveData<List<CategoryData>>
+    suspend fun loadArticlesFromNetwork(start: String? = null, size: Int = 10): Int
+    suspend fun insertArticlesToDb(articles: List<ArticleRes>)
+    suspend fun toggleBookmark(articleId: String): Boolean
+    fun findTags(): LiveData<List<String>>
+    fun findCategoriesData(): LiveData<List<CategoryData>>
     fun rawQueryArticles(filter: ArticleFilter): DataSource.Factory<Int, ArticleItem>
-    fun incrementTagUseCount(tag: String)
+    suspend fun incrementTagUseCount(tag: String)
+    suspend fun findLastArticleId(): String?
+    suspend fun removeArticleContent(articleId: String)
 }
 
 object ArticlesRepository : IArticlesRepository {
 
-    private val network = NetworkDataHolder
-    private val articlesDao = db.articlesDao()
-    private val articlesCountDao = db.articleCountsDao()
-    private val categoriesDao = db.categoriesDao()
-    private val tagsDao = db.tagsDao()
-    private val articlePersonalDao = db.articlePersonalInfosDao()
+    private val network = NetworkManager.api
+    private var articlesDao = db.articlesDao()
+    private var articlesContentDao = db.articleContentsDao()
+    private var articlesCountDao = db.articleCountsDao()
+    private var categoriesDao = db.categoriesDao()
+    private var tagsDao = db.tagsDao()
+    private var articlePersonalDao = db.articlePersonalInfosDao()
 
-    override fun loadArticlesFromNetwork(start: Int, size: Int): List<ArticleRes> =
-        network.findArticlesItem(start, size)
+    @VisibleForTesting(otherwise = VisibleForTesting.NONE)
+    fun setupTestDao(
+        articlesDao: ArticlesDao,
+        articleCountsDao: ArticleCountsDao,
+        categoriesDao: CategoriesDao,
+        tagsDao: TagsDao,
+        articlePersonalDao: ArticlePersonalInfosDao,
+        articlesContentDao: ArticleContentsDao
+    ) {
+        this.articlesDao = articlesDao
+        this.articlesCountDao = articleCountsDao
+        this.categoriesDao = categoriesDao
+        this.tagsDao = tagsDao
+        this.articlePersonalDao = articlePersonalDao
+        this.articlesContentDao = articlesContentDao
+    }
 
-    override fun insertArticlesToDb(articles: List<ArticleRes>) {
+
+    override suspend fun loadArticlesFromNetwork(start: String?, size: Int): Int {
+        val items = network.articles(start, size)
+        if (items.isNotEmpty()) insertArticlesToDb(items)
+        return items.size
+    }
+
+    override suspend fun insertArticlesToDb(articles: List<ArticleRes>) {
         articlesDao.upsert(articles.map { it.data.toArticle() })
         articlesCountDao.upsert(articles.map { it.counts.toArticleCounts() })
 
@@ -50,15 +77,15 @@ object ArticlesRepository : IArticlesRepository {
             .distinct()
             .map { Tag(it) }
 
-        val categories = articles.map { it.data.category }
+        val categories = articles.map { it.data.category.toCategory() }
 
         categoriesDao.insert(categories)
         tagsDao.insert(tags)
         tagsDao.insertRefs(refs.map { ArticleTagXRef(it.first, it.second) })
     }
 
-    override fun toggleBookmark(articleId: String) {
-        articlePersonalDao.toggleBookmarkOrInsert(articleId)
+    override suspend fun toggleBookmark(articleId: String): Boolean {
+        return articlePersonalDao.toggleBookmarkOrInsert(articleId)
     }
 
     override fun findTags(): LiveData<List<String>> {
@@ -73,8 +100,19 @@ object ArticlesRepository : IArticlesRepository {
         return articlesDao.findArticlesByRaw(SimpleSQLiteQuery(filter.toQuery()))
     }
 
-    override fun incrementTagUseCount(tag: String) {
+    override suspend fun incrementTagUseCount(tag: String) {
         tagsDao.incrementTagUseCount(tag)
+    }
+
+    override suspend fun findLastArticleId(): String? = articlesDao.findLastArticleId()
+
+    suspend fun fetchArticleContent(articleId: String) {
+        val content = network.loadArticleContent(articleId)
+        articlesContentDao.insert(content.toArticleContent())
+    }
+
+    override suspend fun removeArticleContent(articleId: String) {
+        articlesContentDao.removeArticleContent(articleId)
     }
 }
 
@@ -158,17 +196,17 @@ class QueryBuilder() {
     private var whereCondition: String? = null
     private var order: String? = null
 
-    fun table(table: String) : QueryBuilder {
+    fun table(table: String): QueryBuilder {
         this.table = table
         return this
     }
 
-    fun orderBy(column: String, isDesc: Boolean = true): QueryBuilder{
+    fun orderBy(column: String, isDesc: Boolean = true): QueryBuilder {
         order = "ORDER BY $column ${if (isDesc) "DESC" else "ASC"}"
         return this
     }
 
-    fun appendWhere(condition: String, logic: String = "AND") : QueryBuilder {
+    fun appendWhere(condition: String, logic: String = "AND"): QueryBuilder {
         if (whereCondition.isNullOrEmpty()) whereCondition = "WHERE $condition "
         else whereCondition += "$logic $condition "
         return this
@@ -181,7 +219,7 @@ class QueryBuilder() {
     }
 
     fun build(): String {
-        check(table != null) {"table must be not null"}
+        check(table != null) { "table must be not null" }
         val strBuilder = StringBuilder("SELECT ")
             .append("$selectColumns ")
             .append("FROM $table ")

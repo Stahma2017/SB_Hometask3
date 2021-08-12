@@ -94,5 +94,4 @@ data class ArticleFull(
     val content: List<MarkdownElement>? = null,
     val source: String? = null,
     val tags: List<String>
-
 )

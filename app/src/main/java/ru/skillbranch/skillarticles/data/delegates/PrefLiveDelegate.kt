@@ -25,8 +25,7 @@ internal class SharedPreferenceLiveData<T>(
     var key: String,
     var defValue: T
 ): LiveData<T>() {
-    private val preferenceChangeListener =
-        SharedPreferences.OnSharedPreferenceChangeListener { _, shKey ->
+    private val preferenceChangeListener = SharedPreferences.OnSharedPreferenceChangeListener { _, shKey ->
             if (shKey == key) {
                 value = readValue(defValue)
             }
