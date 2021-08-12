@@ -3,7 +3,6 @@ package ru.skillbranch.skillarticles.data.delegates
 import android.content.SharedPreferences
 import androidx.lifecycle.LiveData
 import com.squareup.moshi.JsonAdapter
-import ru.skillbranch.skillarticles.data.models.User
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 
