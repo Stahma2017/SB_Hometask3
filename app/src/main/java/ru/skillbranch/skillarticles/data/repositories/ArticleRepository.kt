@@ -135,11 +135,12 @@ object ArticleRepository : IArticleRepository {
         }
 
         try {
-            //FIXME !! after token
             val res = network.decrementLike(articleId, preferences.accessToken!!)
             articleCountsDao.updateLike(articleId, res.likeCount)
         } catch (e: Throwable) {
-            articleCountsDao.decrementLike(articleId)
+            if (e is NoNetworkError) {
+                articleCountsDao.decrementLike(articleId)
+            }
             throw e
         }
     }

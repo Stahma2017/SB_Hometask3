@@ -116,7 +116,6 @@ class ArticleViewModel(
     }
 
     override fun handleLike() {
-
         launchSafety {
             val isLiked = repository.toggleLike(articleId)
 
@@ -131,10 +130,8 @@ class ArticleViewModel(
                     { handleLike() }
                 )
             }
-
             notify(msg)
         }
-
     }
 
 
