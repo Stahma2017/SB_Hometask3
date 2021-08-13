@@ -21,13 +21,11 @@ object NetworkManager {
         val client = OkHttpClient().newBuilder()
             .readTimeout(2, TimeUnit.SECONDS)
             .writeTimeout(5, TimeUnit.SECONDS) //socket timeout (GET)
-         //   .authenticator(TokenAuthenticator()) //refresh token if response status code 401
+          //  .authenticator(TokenAuthenticator()) //refresh token if response status code 401
             .addInterceptor(NetworkStatusInterceptor()) // intercept network status
             .addInterceptor(logging) //intercept req/res for logging
             .addInterceptor(ErrorStatusInterceptor()) //intercept status errors
             .build()
-
-
 
         //retrofit
         val retrofit = Retrofit.Builder()

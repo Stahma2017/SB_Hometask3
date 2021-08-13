@@ -181,25 +181,16 @@ class ArticleViewModel(
             notify(Notify.TextMessage("Comment must be not empty"))
             return
         }
+
         updateState { it.copy(commentText = comment) }
+
         if (!currentState.isAuth) {
             navigate(NavigationCommand.StartLogin())
         } else {
             launchSafety(null, {
-                updateState {
-                    it.copy(
-                        answerTo = null,
-                        answerToMessageId = null,
-                        commentText = null
-                    )
-                }
+                updateState { it.copy(answerTo = null, answerToMessageId = null, commentText = null) }
             }) {
-                repository.sendMessage(
-                    articleId,
-                    currentState.commentText!!,
-                    currentState.answerToMessageId
-                )
-
+                repository.sendMessage(articleId, currentState.commentText!!, currentState.answerToMessageId)
             }
         }
     }

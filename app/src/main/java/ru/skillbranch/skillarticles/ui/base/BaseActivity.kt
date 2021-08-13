@@ -43,7 +43,9 @@ abstract class BaseActivity<T : BaseViewModel<out IViewModelState>> : AppCompatA
         setContentView(layout)
         setSupportActionBar(toolbar)
         viewModel.observeState(this) { subscribeOnState(it) }
-        viewModel.observeNotifications(this) { renderNotification(it) }
+        viewModel.observeNotifications(this) {
+            renderNotification(it)
+        }
         viewModel.observeNavigation(this) { subscribeOnNavigation(it) }
         viewModel.observeLoading(this) { renderLoading(it) }
 

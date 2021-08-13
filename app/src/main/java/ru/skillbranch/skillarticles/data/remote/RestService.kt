@@ -28,11 +28,7 @@ interface RestService {
 
     //https://skill-articles.skill-branch.ru/api/v1/articles/{articlesId}/messages
     @POST("articles/{article}/messages")
-    fun sendMessage(
-        @Path("article") articleId: String,
-        @Body message: MessageReq,
-        @Header("Authorization") token: String
-    ): MessageRes
+    suspend fun sendMessage(@Path("article") articleId: String, @Body message: MessageReq, @Header("Authorization") token: String): MessageRes
 
     //https://skill-articles.skill-branch.ru/api/v1/articles/{articlesId}/counts
     @GET("articles/{article}/counts")
@@ -40,29 +36,30 @@ interface RestService {
 
     //https://skill-articles.skill-branch.ru/api/v1/auth/login
     @POST("auth/login")
-    suspend fun login(@Body loginReq: LoginReq) : AuthRes
+    suspend fun login(@Body loginReq: LoginReq): AuthRes
 
     //https://skill-articles.skill-branch.ru/api/v1/articles/{articlesId}/decrementLikes
     @POST("articles/{article}/decrementLikes")
-    fun decrementLike(
+    suspend fun decrementLike(
         @Path("article") articleId: String,
-        @Header("Authorization") token: String): LikeRes
+        @Header("Authorization") token: String
+    ): LikeRes
 
     //https://skill-articles.skill-branch.ru/api/v1/articles/{articlesId}/incrementLikes
     @POST("articles/{article}/incrementLikes")
-    fun incrementLike(
+    suspend fun incrementLike(
         @Path("article") articleId: String,
         @Header("Authorization") token: String): LikeRes
 
     //https://skill-articles.skill-branch.ru/api/v1/articles/{articlesId}/addBookmark
     @POST("articles/{article}/addBookmark")
-    fun addBookmark(
+    suspend fun addBookmark(
         @Path("article") articleId: String,
         @Header("Authorization") token: String): BookmarkRes
 
     //https://skill-articles.skill-branch.ru/api/v1/articles/{articlesId}/removeBookmark
     @POST("articles/{article}/removeBookmark")
-    fun removeBookmark(
+    suspend fun removeBookmark(
         @Path("article") articleId: String,
         @Header("Authorization") token: String): BookmarkRes
 

@@ -69,12 +69,12 @@ object ArticleRepository : IArticleRepository {
     override fun getAppSettings(): LiveData<AppSettings> =
         preferences.appSettings //from preferences
 
-    override suspend fun toggleLike(articleId: String) : Boolean {
-      return articlePersonalDao.toggleLikeOrInsert(articleId)
+    override suspend fun toggleLike(articleId: String): Boolean {
+        return articlePersonalDao.toggleLikeOrInsert(articleId)
     }
 
     override suspend fun toggleBookmark(articleId: String): Boolean {
-      return articlePersonalDao.toggleBookmarkOrInsert(articleId)
+        return articlePersonalDao.toggleBookmarkOrInsert(articleId)
     }
 
     override suspend fun addBookmark(articleId: String) {
@@ -161,17 +161,8 @@ object ArticleRepository : IArticleRepository {
         }
     }
 
-    override suspend fun sendMessage(
-        articleId: String,
-        message: String,
-        answerToMessageId: String?
-    ) {
-        val (_, messageCount) = network.sendMessage(
-            articleId,
-            MessageReq(message, answerToMessageId),
-            //FIXME why !! required, when it is absent in tutorial
-            preferences.accessToken!!
-        )
+    override suspend fun sendMessage(articleId: String, message: String, answerToMessageId: String?) {
+        val (_, messageCount) = network.sendMessage(articleId, MessageReq(message, answerToMessageId), preferences.accessToken!!)
         articleCountsDao.updateCommentsCount(articleId, messageCount)
     }
 
