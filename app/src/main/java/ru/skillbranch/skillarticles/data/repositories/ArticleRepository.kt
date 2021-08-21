@@ -1,5 +1,6 @@
 package ru.skillbranch.skillarticles.data.repositories
 
+import android.util.Log
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.LiveData
 import androidx.paging.DataSource
@@ -140,6 +141,7 @@ object ArticleRepository : IArticleRepository {
         } catch (e: Throwable) {
             if (e is NoNetworkError) {
                 articleCountsDao.decrementLike(articleId)
+                return
             }
             throw e
         }
@@ -150,13 +152,13 @@ object ArticleRepository : IArticleRepository {
             articleCountsDao.incrementLike(articleId)
             return
         }
-
         try {
             val res = network.incrementLike(articleId, preferences.accessToken!!)
             articleCountsDao.updateLike(articleId, res.likeCount)
         } catch (e: Throwable) {
             if (e is NoNetworkError) {
                 articleCountsDao.incrementLike(articleId)
+                return
             }
             throw e
         }
