@@ -31,7 +31,6 @@ interface IArticlesRepository {
 }
 
 object ArticlesRepository : IArticlesRepository {
-
     private val network = NetworkManager.api
     private var articlesDao = db.articlesDao()
     private var articlesContentDao = db.articleContentsDao()
@@ -182,7 +181,7 @@ class ArticleFilter(
             qb.appendWhere("refs.t_id = '$search'")
         }
         if (isBookmark) qb.appendWhere("is_bookmark = 1")
-        if (categories.isNotEmpty()) qb.appendWhere("category_id IN (${categories.joinToString(",")})")
+        if (categories.isNotEmpty()) qb.appendWhere("category_id IN (${categories.joinToString("\",\"", "\"", "\"" )})")
 
         qb.orderBy("date")
         return qb.build()

@@ -4,8 +4,10 @@ import android.app.AlertDialog
 import android.app.Dialog
 import android.os.Bundle
 import android.view.LayoutInflater
+import androidx.core.os.bundleOf
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.setFragmentResult
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -13,7 +15,11 @@ import ru.skillbranch.skillarticles.R
 import ru.skillbranch.skillarticles.viewmodels.articles.ArticlesViewModel
 
 class ChoseCategoryDialog : DialogFragment() {
-    private val viewModel : ArticlesViewModel by activityViewModels()
+    companion object {
+        const val CHOOSE_CATEGORY_KEY = "CHOOSE_CATEGORY_KEY"
+        const val SELECTED_CATEGORIES = "SELECTED_CATEGORIES"
+    }
+
     private val selected = mutableListOf<String>()
     private val args: ChoseCategoryDialogArgs by navArgs()
 
@@ -44,10 +50,10 @@ class ChoseCategoryDialog : DialogFragment() {
         return AlertDialog.Builder(requireContext())
             .setTitle("Chse category")
             .setPositiveButton("Apply") { _, _ ->
-                viewModel.applyCategories(selected.toList())
+                setFragmentResult(CHOOSE_CATEGORY_KEY, bundleOf(SELECTED_CATEGORIES to selected.toList()))
             }
             .setNegativeButton("Reset") { _, _ ->
-                viewModel.applyCategories(emptyList())
+                setFragmentResult(CHOOSE_CATEGORY_KEY, bundleOf(SELECTED_CATEGORIES to emptyList<String>()))
             }
             .setView(listView)
             .create()

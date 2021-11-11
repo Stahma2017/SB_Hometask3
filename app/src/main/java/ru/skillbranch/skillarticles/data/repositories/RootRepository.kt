@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData
 import ru.skillbranch.skillarticles.data.local.PrefManager
 import ru.skillbranch.skillarticles.data.remote.NetworkManager
 import ru.skillbranch.skillarticles.data.remote.req.LoginReq
-import kotlin.math.log
 
 object RootRepository {
 

@@ -20,8 +20,12 @@ abstract class BaseViewModel<T : IViewModelState>(
 ) : ViewModel() {
     @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
     val notifications = MutableLiveData<Event<Notify>>()
+
     @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
     val navigation = MutableLiveData<Event<NavigationCommand>>()
+
+    @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
+    val permissions = MutableLiveData<Event<List<String>>>()
     private val loading = MutableLiveData<Loading>(Loading.HIDE_LOADING)
 
     /***
@@ -134,7 +138,7 @@ abstract class BaseViewModel<T : IViewModelState>(
     @Suppress("UNCHECKED_CAST")
     fun restoreState() {
         val restoredState = currentState.restore(handleState) as T
-        if(currentState == restoredState) return
+        if (currentState == restoredState) return
         state.value = currentState.restore(handleState) as T
     }
 
@@ -145,16 +149,20 @@ abstract class BaseViewModel<T : IViewModelState>(
     ) {
         // исползуется обработчик ошибок переданный в качестве первого аргумента или обработчик ошибок по умполчанию
         val errHand = CoroutineExceptionHandler { _, err ->
-            errHandler?.invoke(err) ?: when(err) {
+            errHandler?.invoke(err) ?: when (err) {
                 is NoNetworkError -> notify(Notify.TextMessage("Network not available, check internet connection"))
 
-                is SocketTimeoutException -> notify(Notify.ActionMessage("Network timeout exception - please try again",
-                    "Retry")
-                { launchSafety(errHandler, compHandler, block)})
+                is SocketTimeoutException -> notify(Notify.ActionMessage(
+                    "Network timeout exception - please try again",
+                    "Retry"
+                )
+                { launchSafety(errHandler, compHandler, block) })
 
-                is ApiError.InternalServerError -> notify(Notify.ActionMessage(err.message,
-                    "Retry")
-                { launchSafety(errHandler, compHandler, block)})
+                is ApiError.InternalServerError -> notify(Notify.ActionMessage(
+                    err.message,
+                    "Retry"
+                )
+                { launchSafety(errHandler, compHandler, block) })
 
                 is ApiError -> notify(Notify.ErrorMessage(err.message))
 
@@ -170,6 +178,14 @@ abstract class BaseViewModel<T : IViewModelState>(
             hideLoading()
             compHandler?.invoke(it)
         }
+    }
+
+    fun requestPermissions(requestPermissions: List<String>) {
+        permissions.value = Event(requestPermissions)
+    }
+
+    fun observePermissions(owner: LifecycleOwner, handle: (permissions: List<String>) -> Unit) {
+        permissions.observe(owner, EventObserver { handle(it) })
     }
 
 
